@@ -1,6 +1,6 @@
 # ocm-container-custom
 
-Simple `Makefile` and `Containerfile` to build [ocm-container](https://github.com/openshift/ocm-contianer) with the backplane-cli
+Simple `Makefile` and `Dockerfile` to build [ocm-container](https://github.com/openshift/ocm-contianer) with the backplane-cli
 and SRE utils from OPS-SOP. It can be easily extended or customized to add your own tools.
 
 Please consider creating PRs upstream for things that may be useful to others, however.
