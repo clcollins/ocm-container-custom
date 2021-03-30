@@ -7,8 +7,11 @@ Please consider creating PRs upstream for things that may be useful to others, h
 
 ## Usage
 
+Source your ocm-container config (`source ~/.config/ocm-container/env.source`) and then build the container image ocm-container:latest with backplane and SRE tools by running the command `make`:
+
 ```shell
-# Build the container image ocm-container:latest with backplane and SRE tools
+# Build ocm-container with backplane-cli and SRE tooling
+$ source ~/.config/ocm-container/env.source
 $ make
 ```
 
