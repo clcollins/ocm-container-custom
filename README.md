@@ -14,4 +14,3 @@ Source your ocm-container config (`source ~/.config/ocm-container/env.source`) a
 $ source ~/.config/ocm-container/env.source
 $ make
 ```
-
