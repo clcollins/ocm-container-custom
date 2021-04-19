@@ -6,6 +6,8 @@ IMAGE_NAME="ocm-container:latest"
 
 TMPDIR := $(shell mktemp -d /tmp/ocm-container-custom.XXXXX)
 
+default: all
+
 .PHONY: all
 all: check_env clone build
 
