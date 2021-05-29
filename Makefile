@@ -35,5 +35,7 @@ build_backplane:
 
 .PHONY: build_custom
 build_custom:
-	@rsync -z ./Dockerfile $(TMPDIR)/ops-sop/Dockerfile
+	@rsync -azv ./Dockerfile $(TMPDIR)/ops-sop/Dockerfile
+	@rsync -azv ./bashrc.d/ $(TMPDIR)/ops-sop/bashrc.d/
+	@rsync -azv ./utils/ $(TMPDIR)/ops-sop/v4/utils/
 	@pushd $(TMPDIR)/ops-sop/ && ${CONTAINER_SUBSYS} build -t $(IMAGE_NAME) .
