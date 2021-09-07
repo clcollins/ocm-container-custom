@@ -101,10 +101,15 @@ then
   tmpd=$(mktemp -d)
   trap "rm -fr $tmpd" EXIT
 
+  ocm describe cluster $CLUSTER_UUID > $tmpd/clusterinfo
+  INTERNAL_ID=$(awk -F: '$1 == "ID" {print $2}' $tmpd/clusterinfo)
+  REGION=$(awk -F: '$1 == "Region" {gsub(/^[ \t]+/, "", $2); print $2}' $tmpd/clusterinfo)
+  SHARD=$(awk -F. '$1 ~ /^Shard:/ {print $2}' $tmpd/clusterinfo)
+
   aws-get-creds.sh $CLUSTER_UUID > $tmpd/exports 2>/dev/null
   source $tmpd/exports
 
-  aws-validate-cluster.sh -r $AWS_DEFAULT_REGION -n $CLUSTER_NAME
+  aws-validate-cluster.sh -r $REGION -n $CLUSTER_NAME
 
   # If FORCE is not TRUE, then prompt for confirmation
   if [[ ${FORCE} != 'TRUE' ]]
