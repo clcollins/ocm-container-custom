@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+
+# Silences alert, posting a note to the Pager Duty incident
+
+# User ID of the silent test account
+PD_SILENT_TEST_USER='P8QS6CC'
+
+# Parent incident into which we merge CHGM incidents
+CHGM_PARENT_INCIDENT='PJWIXM0'
+
+usage(){
+  echo 'Silence an alert, posting a note to the PagerDuty incident'
+  echo ''
+  echo '  Accepts a PD incident number, and a quote-enclosed string'
+  echo ''
+  echo 'Usage'
+  echo "  ${0} [options] [pagerduty_incident] [note]"
+  echo ''
+  echo 'Options'
+  echo '  -h    Print help message'
+  echo '  -f    Do not prompt for confirmation before silencing'
+  echo ''
+}
+
+FORCE='FALSE'
+
+while getopts ':hf' opt
+do
+  case ${opt} in
+    h ) usage ; exit 0
+      ;;
+    f ) FORCE='TRUE'
+      ;;
+    \? ) echo -e "Unknown option: -${OPTARG}\n" ; usage ; exit 1
+      ;;
+  esac
+done
+shift $((OPTIND -1))
+
+# Check required commands are in $PATH
+if ! command -v pd > /dev/null
+then
+  echo -e "Command 'pd' is required for this script to work.\n"
+  usage
+  exit 1
+fi
+
+PD_ALERT="${1}"
+
+# Note to add to the PD alert before silence and merge
+PD_CHGM_NOTE="${2}"
+
+if [[ -z "${PD_ALERT}" ]] ;
+then
+  echo -e 'The "pagerduty_incident" argument is required\n'
+  usage
+  exit 1
+fi
+
+if [[ -z "${PD_CHGM_NOTE}" ]] ;
+then
+  echo -e 'A PagerDuty note is required\n'
+  usage
+  exit 1
+fi
+
+set -o nounset
+
+# PD CLI Payload to merge this incident into the CHGM_PARENT_INCIDENT
+JSON_DATA="{\"source_incidents\":[{\"id\":\"${PD_ALERT}\",\"type\":\"incident_reference\"}]}"
+
+ALERT_JSON="$(pd rest:get -e=/incidents/${PD_ALERT}/alerts 2>/dev/null)"
+CLUSTER_UUID="$(jq -r '.alerts[].body.details.cluster_id' <<< $ALERT_JSON )"
+
+if [[ -z $CLUSTER_UUID ]]
+then
+  echo "Failed to get cluster uuid associated with alert '${PD_ALERT}'"
+  exit 1
+fi
+
+# If FORCE is not TRUE, then prompt for confirmation
+if [[ ${FORCE} != 'TRUE' ]]
+then
+  read -p 'Silence the alert? (Y/n)' -n 1 -r
+  echo ''
+  if [[ ! $REPLY =~ ^[Yy]$ ]]
+  then
+      exit 1
+  fi
+fi
+
+
+pd incident:ack -i ${PD_ALERT}
+pd incident:notes -i ${PD_ALERT} -n "$PD_CHGM_NOTE"
+pd incident:assign -i ${PD_ALERT} -u $PD_SILENT_TEST_USER
+pd rest:put --endpoint /incidents/${CHGM_PARENT_INCIDENT}/merge --data="${JSON_DATA}"
+
