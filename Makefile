@@ -27,7 +27,7 @@ check_env:
 
 .PHONY: build_ocm_container
 build_ocm_container:
-	@pushd $(TMPDIR)/ocm-container && ./build.sh
+	@pushd $(TMPDIR)/ocm-container && ./build.sh -- $(BUILD_OPTS)
 
 .PHONY: build_backplane
 build_backplane:
