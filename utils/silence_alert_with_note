@@ -5,9 +5,6 @@
 # User ID of the silent test account
 PD_SILENT_TEST_USER='P8QS6CC'
 
-# Parent incident into which we merge CHGM incidents
-CHGM_PARENT_INCIDENT='PJWIXM0'
-
 usage(){
   echo 'Silence an alert, posting a note to the PagerDuty incident'
   echo ''
@@ -48,7 +45,7 @@ fi
 PD_ALERT="${1}"
 
 # Note to add to the PD alert before silence and merge
-PD_CHGM_NOTE="${2}"
+PD_NOTE="${2}"
 
 if [[ -z "${PD_ALERT}" ]] ;
 then
@@ -57,7 +54,7 @@ then
   exit 1
 fi
 
-if [[ -z "${PD_CHGM_NOTE}" ]] ;
+if [[ -z "${PD_NOTE}" ]] ;
 then
   echo -e 'A PagerDuty note is required\n'
   usage
@@ -65,9 +62,6 @@ then
 fi
 
 set -o nounset
-
-# PD CLI Payload to merge this incident into the CHGM_PARENT_INCIDENT
-JSON_DATA="{\"source_incidents\":[{\"id\":\"${PD_ALERT}\",\"type\":\"incident_reference\"}]}"
 
 ALERT_JSON="$(pd rest:get -e=/incidents/${PD_ALERT}/alerts 2>/dev/null)"
 CLUSTER_UUID="$(jq -r '.alerts[].body.details.cluster_id' <<< $ALERT_JSON )"
@@ -89,9 +83,7 @@ then
   fi
 fi
 
-
 pd incident:ack -i ${PD_ALERT}
-pd incident:notes -i ${PD_ALERT} -n "$PD_CHGM_NOTE"
+pd incident:notes -i ${PD_ALERT} -n "$PD_NOTE"
 pd incident:assign -i ${PD_ALERT} -u $PD_SILENT_TEST_USER
-pd rest:put --endpoint /incidents/${CHGM_PARENT_INCIDENT}/merge --data="${JSON_DATA}"
 

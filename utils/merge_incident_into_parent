@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+
+# Merges one incident into another as a child incident
+
+
+# These commands must be in the $PATH for this script to work
+REQUIRED_COMMANDS=(pd )
+
+usage(){
+  echo 'Merge an incident into another parent incident'
+  echo ''
+  echo '  Accepts a PD incident number for the child incident, and another for the parent incident,'
+  echo '  then merges the former into the latter.'
+  echo ''
+  echo 'Usage'
+  echo "  ${0} [options] [pagerduty_incident] [parent_incident]"
+  echo ''
+  echo 'Options'
+  echo '  -h    Print help message'
+  echo '  -f    Do not prompt for confirmation before silencing and sending a Servicelog (assumes not -s)'
+  echo ''
+}
+
+FORCE='FALSE'
+
+while getopts ':hf' opt
+do
+  case ${opt} in
+    h ) usage ; exit 0
+      ;;
+    f ) FORCE='TRUE'
+      ;;
+    \? ) echo -e "Unknown option: -${OPTARG}\n" ; usage ; exit 1
+      ;;
+  esac
+done
+shift $((OPTIND -1))
+
+# Check required commands are in $PATH
+for cmd in "${REQUIRED_COMMANDS[@]}"
+do
+  if ! command -v $cmd > /dev/null
+  then
+    echo -e "Command $cmd is required for this script to work.\n"
+    usage
+    exit 1
+   fi
+done
+
+PD_ALERT="${1}"
+
+if [[ -z "${PD_ALERT}" ]] ;
+then
+  echo -e 'The "pagerduty_incident" argument is required\n'
+  usage
+  exit 1
+fi
+
+# Parent incident into which we merge the incident
+PARENT_INCIDENT="${2}"
+
+if [[ -z "${PARENT_INCIDENT}" ]] ;
+then
+  echo -e 'The "parent_incident" argument is required\n'
+  usage
+  exit 1
+fi
+
+
+set -o nounset
+
+# PD CLI Payload to merge this incident into the CHGM_PARENT_INCIDENT
+JSON_DATA="{\"source_incidents\":[{\"id\":\"${PD_ALERT}\",\"type\":\"incident_reference\"}]}"
+
+pd incident:ack -i ${PD_ALERT}
+pd incident:notes -i ${PD_ALERT} -n "Merging with parent incident ${PARENT_INCIDENT}"
+pd rest:put --endpoint /incidents/${PARENT_INCIDENT}/merge --data="${JSON_DATA}"
