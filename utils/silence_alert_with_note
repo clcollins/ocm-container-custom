@@ -63,26 +63,6 @@ fi
 
 set -o nounset
 
-ALERT_JSON="$(pd rest:get -e=/incidents/${PD_ALERT}/alerts 2>/dev/null)"
-CLUSTER_UUID="$(jq -r '.alerts[].body.details.cluster_id' <<< $ALERT_JSON )"
-
-if [[ -z $CLUSTER_UUID ]]
-then
-  echo "Failed to get cluster uuid associated with alert '${PD_ALERT}'"
-  exit 1
-fi
-
-# If FORCE is not TRUE, then prompt for confirmation
-if [[ ${FORCE} != 'TRUE' ]]
-then
-  read -p 'Silence the alert? (Y/n)' -n 1 -r
-  echo ''
-  if [[ ! $REPLY =~ ^[Yy]$ ]]
-  then
-      exit 1
-  fi
-fi
-
 pd incident:ack -i ${PD_ALERT}
 pd incident:notes -i ${PD_ALERT} -n "$PD_NOTE"
 pd incident:assign -i ${PD_ALERT} -u $PD_SILENT_TEST_USER
