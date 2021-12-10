@@ -1,4 +1,5 @@
 OCM_CONTAINER="github.com:openshift/ocm-container"
+OCM_CONTAINER_BRANCH="master"
 BACKPLANE="gitlab.cee.redhat.com:service/backplane-cli"
 UTILS="github.com:openshift/ops-sop"
 
@@ -14,7 +15,7 @@ all: check_env clone build
 .PHONY: clone
 clone:
 	@echo Workdir: $(TMPDIR)
-	@git -C $(TMPDIR) clone --depth=1 git@$(OCM_CONTAINER).git
+	@git -C $(TMPDIR) clone --depth=1 --branch $(OCM_CONTAINER_BRANCH) git@$(OCM_CONTAINER).git
 	@git -C $(TMPDIR) clone --depth=1 git@$(BACKPLANE).git
 	@git -C $(TMPDIR) clone --depth=1 git@$(UTILS).git
 

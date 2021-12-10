@@ -1,5 +1,14 @@
 alias login="ocm backplane tunnel --all -- --daemon"
 
+obp(){
+  if [ -z "$1" ]
+  then
+    echo "A namespace name is required"
+  else
+    ocm backplane project $1
+  fi
+}
+
 obl(){
   if [ -z "$1" ]
   then
