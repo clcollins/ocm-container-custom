@@ -1,4 +1,4 @@
-alias login="ocm backplane tunnel --all -- --daemon"
+alias login="ocm backplane tunnel --bastion --all -- --daemon"
 
 obp(){
   if [ -z "$1" ]
