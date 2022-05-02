@@ -1,11 +1,16 @@
-OCM_CONTAINER="github.com:openshift/ocm-container"
+OCM_CONTAINER_ORG="openshift"
+OCM_CONTAINER_REPO="ocm-container"
 OCM_CONTAINER_BRANCH="master"
+
 BACKPLANE="gitlab.cee.redhat.com:service/backplane-cli"
 UTILS="github.com:openshift/ops-sop"
 
 IMAGE_NAME="ocm-container:latest"
 
 TMPDIR := $(shell mktemp -d /tmp/ocm-container-custom.XXXXX)
+
+
+CONTAINER_SUBSYS="podman"
 
 default: all
 
@@ -15,7 +20,7 @@ all: check_env clone build
 .PHONY: clone
 clone:
 	@echo Workdir: $(TMPDIR)
-	@git -C $(TMPDIR) clone --depth=1 --branch $(OCM_CONTAINER_BRANCH) git@$(OCM_CONTAINER).git
+	@git -C $(TMPDIR) clone --depth=1 --branch $(OCM_CONTAINER_BRANCH) git@github.com:$(OCM_CONTAINER_ORG)/$(OCM_CONTAINER_REPO).git
 	@git -C $(TMPDIR) clone --depth=1 git@$(BACKPLANE).git
 	@git -C $(TMPDIR) clone --depth=1 git@$(UTILS).git
 
