@@ -10,7 +10,7 @@ IMAGE_NAME="ocm-container:latest"
 TMPDIR := $(shell mktemp -d /tmp/ocm-container-custom.XXXXX)
 
 
-CONTAINER_SUBSYS="podman"
+CONTAINER_SUBSYS?="podman"
 
 default: all
 
@@ -33,7 +33,8 @@ check_env:
 
 .PHONY: build_ocm_container
 build_ocm_container:
-	@pushd $(TMPDIR)/ocm-container && ./build.sh -- $(BUILD_OPTS)
+        # Don't use the default build.sh script from ocm-container, because it doesn't respect pre-set CONTAINER_SUBSYS env var
+	@pushd $(TMPDIR)/ocm-container && ${CONTAINER_SUBSYS} build -t ocm-container:latest .
 
 .PHONY: build_backplane
 build_backplane:
