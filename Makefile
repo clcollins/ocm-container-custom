@@ -29,7 +29,7 @@ build: build_ocm_container build_backplane build_custom
 
 .PHONY: check_env
 check_env:
-	@if test -z ${CONTAINER_SUBSYS} ; then echo 'CONTAINER_SUBSYS must be set. Hint: `source ~/.config/ocm-container/env.source`' ; exit 1 ; fi
+	@if test -z "${CONTAINER_SUBSYS}" ; then echo 'CONTAINER_SUBSYS must be set. Hint: `source ~/.config/ocm-container/env.source`' ; exit 1 ; fi
 
 .PHONY: build_ocm_container
 build_ocm_container:
