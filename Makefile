@@ -20,8 +20,13 @@ all: check_env clone build
 .PHONY: clone
 clone:
 	@echo Workdir: $(TMPDIR)
+	@echo "######## CLONE OCM CONTAINER ########"
+	@echo "git@github.com:$(OCM_CONTAINER_ORG)/$(OCM_CONTAINER_REPO)"
 	@git -C $(TMPDIR) clone --depth=1 --branch $(OCM_CONTAINER_BRANCH) git@github.com:$(OCM_CONTAINER_ORG)/$(OCM_CONTAINER_REPO).git
+	@echo "######## CLONE BACKPLANE ########"
 	@git -C $(TMPDIR) clone --depth=1 git@$(BACKPLANE).git
+	@echo "######## CLONE OCM CUSTOM ########"
+	@echo "git@$(BACKPLANE).git"
 	@git -C $(TMPDIR) clone --depth=1 git@$(UTILS).git
 
 .PHONY: build
@@ -33,15 +38,18 @@ check_env:
 
 .PHONY: build_ocm_container
 build_ocm_container:
+	@echo "######## BUILD OCM CONTAINER ########"
         # Don't use the default build.sh script from ocm-container, because it doesn't respect pre-set CONTAINER_SUBSYS env var
 	@pushd $(TMPDIR)/ocm-container && ${CONTAINER_SUBSYS} build -t ocm-container:latest .
 
 .PHONY: build_backplane
 build_backplane:
+	@echo "######## BUILD BACKPLANE ########"
 	@pushd $(TMPDIR)/backplane-cli/hack/ocm-container/ && ${CONTAINER_SUBSYS} build -t $(IMAGE_NAME) .
 
 .PHONY: build_custom
 build_custom:
+	@echo "######## BUILD OCM CUSTOM ########"
 	@rsync -azv ./Dockerfile $(TMPDIR)/ops-sop/Dockerfile
 	@rsync -azv ./bashrc.d/ $(TMPDIR)/ops-sop/bashrc.d/
 	@rsync -azv ./utils/ $(TMPDIR)/ops-sop/v4/utils/
