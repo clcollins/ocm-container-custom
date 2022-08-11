@@ -2,9 +2,8 @@ FROM ocm-container:latest
 MAINTAINER "Chris Collins <chris.collins@redhat.com>"
 
 # Install TMUX
-RUN dnf install -y tmux \
-  && dnf clean-all \
-  && rm -rf /var/cache/yum
+COPY --from=quay.io/chcollin/tmux-static-builder:latest /tmux /usr/bin/tmux
+RUN tmux -V
 
 # Relative to TMPDIR
 COPY bashrc.d/* /root/.bashrc.d/
