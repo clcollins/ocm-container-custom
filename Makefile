@@ -2,7 +2,7 @@ OCM_CONTAINER_ORG="openshift"
 OCM_CONTAINER_REPO="ocm-container"
 OCM_CONTAINER_BRANCH="master"
 
-BACKPLANE="gitlab.cee.redhat.com:service/backplane-cli"
+BACKPLANE="gitlab.cee.redhat.com/service/backplane-cli"
 UTILS="github.com:openshift/ops-sop"
 TMUX="github.com:clcollins/tmux-static-builder"
 
@@ -28,9 +28,9 @@ clone:
 	@echo "git@github.com:$(OCM_CONTAINER_ORG)/$(OCM_CONTAINER_REPO)"
 	@git -C $(TMPDIR) clone --depth=1 --branch $(OCM_CONTAINER_BRANCH) git@github.com:$(OCM_CONTAINER_ORG)/$(OCM_CONTAINER_REPO).git
 	@echo "######## CLONE BACKPLANE ########"
-	@git -C $(TMPDIR) clone --depth=1 git@$(BACKPLANE).git
+	@git -C $(TMPDIR) clone --depth=1 https://$(BACKPLANE).git
 	@echo "######## CLONE OCM CUSTOM ########"
-	@echo "git@$(BACKPLANE).git"
+	@echo "git@$(UTILS).git"
 	@git -C $(TMPDIR) clone --depth=1 git@$(UTILS).git
 
 .PHONY: build
