@@ -1,17 +1,19 @@
-OCM_CONTAINER_ORG="openshift"
-OCM_CONTAINER_REPO="ocm-container"
-OCM_CONTAINER_BRANCH="master"
+OCM_CONTAINER_ORG = "openshift"
+OCM_CONTAINER_REPO = "ocm-container"
+OCM_CONTAINER_BRANCH = "master"
 
-BACKPLANE="gitlab.cee.redhat.com/service/backplane-cli"
-UTILS="github.com:openshift/ops-sop"
-TMUX="github.com:clcollins/tmux-static-builder"
+BACKPLANE = "gitlab.cee.redhat.com/service/backplane-cli"
+UTILS = "github.com:openshift/ops-sop"
+TMUX = "github.com:clcollins/tmux-static-builder"
 
-IMAGE_NAME="ocm-container:latest"
+IMAGE_NAME = "ocm-container:latest"
 
 TMPDIR := $(shell mktemp -d /tmp/ocm-container-custom.XXXXX)
 
 
-CONTAINER_SUBSYS?="podman"
+CONTAINER_SUBSYS ?= podman
+
+CACHE ?=
 
 default: all
 
@@ -48,13 +50,13 @@ build_tmux:
 .PHONY: build_ocm_container
 build_ocm_container:
 	@echo "######## BUILD OCM CONTAINER ########"
-        # Don't use the default build.sh script from ocm-container, because it doesn't respect pre-set CONTAINER_SUBSYS env var
-	@pushd $(TMPDIR)/ocm-container && ${CONTAINER_SUBSYS} build -t ocm-container:latest .
+	# Don't use the default build.sh script from ocm-container, because it doesn't respect pre-set CONTAINER_SUBSYS env var
+	pushd $(TMPDIR)/ocm-container && ${CONTAINER_SUBSYS} build $(CACHE) -t ocm-container:latest .
 
 .PHONY: build_backplane
 build_backplane:
 	@echo "######## BUILD BACKPLANE ########"
-	@pushd $(TMPDIR)/backplane-cli/hack/ocm-container/ && ${CONTAINER_SUBSYS} build -t $(IMAGE_NAME) .
+	@pushd $(TMPDIR)/backplane-cli/hack/ocm-container/ && ${CONTAINER_SUBSYS} build $(CACHE) -t $(IMAGE_NAME) .
 
 .PHONY: build_custom
 build_custom:
@@ -62,4 +64,4 @@ build_custom:
 	@rsync -azv ./Dockerfile $(TMPDIR)/ops-sop/Dockerfile
 	@rsync -azv ./bashrc.d/ $(TMPDIR)/ops-sop/bashrc.d/
 	@rsync -azv ./utils/ $(TMPDIR)/ops-sop/v4/utils/
-	@pushd $(TMPDIR)/ops-sop/ && ${CONTAINER_SUBSYS} build -t $(IMAGE_NAME) .
+	@pushd $(TMPDIR)/ops-sop/ && ${CONTAINER_SUBSYS} build $(CACHE) -t $(IMAGE_NAME) .
