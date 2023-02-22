@@ -13,7 +13,7 @@ TMPDIR := $(shell mktemp -d /tmp/ocm-container-custom.XXXXX)
 
 CONTAINER_SUBSYS ?= podman
 
-CACHE ?=
+CACHE ?= --no-cache
 
 default: all
 
