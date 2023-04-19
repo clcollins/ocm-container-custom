@@ -17,7 +17,7 @@ CONTAINER_SUBSYS ?= podman
 
 CACHE ?= --no-cache
 
-PULL_BASE_IMAGE ?= TRUE
+PULL_BASE_IMAGE ?= FALSE
 
 default: all
 
@@ -63,7 +63,7 @@ ifeq ($(PULL_BASE_IMAGE), FALSE)
 	pushd $(TMPDIR)/ocm-container && $(CONTAINER_SUBSYS) build $(CACHE) -t $(IMAGE_NAME) .
 else
 	@echo "######## PULL OCM CONTAINER ########"
-  $(CONTAINER_SUBSYS) pull $(IMAGE_REPO)/$(IMAGE_NAME)
+	$(CONTAINER_SUBSYS) pull $(IMAGE_REPO)/$(IMAGE_NAME)
 	$(CONTAINER_SUBSYS) tag $(IMAGE_REPO)/$(IMAGE_NAME) $(IMAGE_NAME)
 endif
 
