@@ -1,0 +1,41 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+if [ -z $NEW_USER ] ;
+then
+        echo "NEW_USER is not set"
+        exit 1
+fi
+
+if [ -z $CLUSTER_ID ] ;
+then
+        echo "CLUSTER_ID is not set"
+        exit 1
+fi
+
+if [ -z $OCM_ACCESS_TOKEN ] ;
+then
+        echo "OCM_ACCESS_TOKEN is not set"
+        exit 1
+fi
+
+echo "Transferring cluster ${CLUSTER_ID}... " 
+
+
+osdctl servicelog post $CLUSTER_ID \
+  -t https://raw.githubusercontent.com/openshift/managed-notifications/master/osd/maintenance_starting.json \
+  -p DATE="$(date)"
+
+pull-secret-update.sh --user-id $NEW_USER \
+  --cluster $CLUSTER_ID --environment production
+
+osdctl cluster transfer-owner -C $CLUSTER_ID \
+  --new-owner $NEW_USER
+
+osdctl servicelog post $CLUSTER_ID \
+  -t https://raw.githubusercontent.com/openshift/managed-notifications/master/osd/maintenance_completed.json \
+  -p DATE="$(date)"
+
