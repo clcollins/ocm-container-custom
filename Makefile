@@ -2,12 +2,13 @@ OCM_CONTAINER_ORG = "openshift"
 OCM_CONTAINER_REPO = "ocm-container"
 OCM_CONTAINER_BRANCH = "master"
 
-IMAGE_REPO = "quay.io/chcollin"
+IMAGE_REPO = "quay.io/app-sre"
 IMAGE_NAME = "ocm-container:latest"
 
-BACKPLANE = "gitlab.cee.redhat.com/service/backplane-cli"
 UTILS = "github.com:openshift/ops-sop"
 TMUX = "github.com:clcollins/tmux-static-builder"
+
+VPN = "Raleigh (RDU2)"
 
 
 TMPDIR := $(shell mktemp -d /tmp/ocm-container-custom.XXXXX)
@@ -17,7 +18,7 @@ CONTAINER_SUBSYS ?= podman
 
 CACHE ?= --no-cache
 
-PULL_BASE_IMAGE ?= FALSE
+PULL_BASE_IMAGE ?= TRUE
 
 default: all
 
@@ -36,14 +37,12 @@ ifeq ($(PULL_BASE_IMAGE), FALSE)
 	@echo "git@github.com:$(OCM_CONTAINER_ORG)/$(OCM_CONTAINER_REPO)"
 	@git -C $(TMPDIR) clone --depth=1 --branch $(OCM_CONTAINER_BRANCH) git@github.com:$(OCM_CONTAINER_ORG)/$(OCM_CONTAINER_REPO).git
 endif
-	@echo "######## CLONE BACKPLANE ########"
-	@git -C $(TMPDIR) clone --depth=1 https://$(BACKPLANE).git
 	@echo "######## CLONE OCM CUSTOM ########"
 	@echo "git@$(UTILS).git"
 	@git -C $(TMPDIR) clone --depth=1 git@$(UTILS).git
 
 .PHONY: build
-build: build_ocm_container build_backplane build_tmux build_custom
+build: build_ocm_container build_tmux build_custom
 
 .PHONY: check_env
 check_env:
@@ -66,11 +65,6 @@ else
 	$(CONTAINER_SUBSYS) pull $(IMAGE_REPO)/$(IMAGE_NAME)
 	$(CONTAINER_SUBSYS) tag $(IMAGE_REPO)/$(IMAGE_NAME) $(IMAGE_NAME)
 endif
-
-.PHONY: build_backplane
-build_backplane:
-	@echo "######## BUILD BACKPLANE ########"
-	@pushd $(TMPDIR)/backplane-cli/hack/ocm-container/ && ${CONTAINER_SUBSYS} build $(CACHE) -t $(IMAGE_NAME) .
 
 .PHONY: build_custom
 build_custom:
