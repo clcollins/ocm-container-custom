@@ -7,5 +7,4 @@ RUN tmux -V
 
 # Relative to TMPDIR
 COPY bashrc.d/* /root/.bashrc.d/
-COPY v4/utils /root/utils
-RUN chmod +x /root/utils/*
+COPY v4/utils /root/.local/bin
