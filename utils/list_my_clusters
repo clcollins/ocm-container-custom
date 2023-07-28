@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# List clusters named like the OCM_USER (default), or by arguments
+
+NAME=${@:-${OCM_USER}}
+QUOTE="'"
+
+ocm get /api/clusters_mgmt/v1/clusters -p "search=name like ${QUOTE}%${NAME}%${QUOTE}" \
+    | jq -r .items[].name
+
