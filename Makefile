@@ -7,9 +7,10 @@ IMAGE_NAME = "ocm-container:latest"
 
 UTILS = "github.com:openshift/ops-sop"
 TMUX = "github.com:clcollins/tmux-static-builder"
+TMUX_IMAGE_REPO = "quay.io/chcollin"
+TMUX_IMAGE_NAME = "tmux:latest"
 
 VPN = "Raleigh (RDU2)"
-
 
 TMPDIR := $(shell mktemp -d /tmp/ocm-container-custom.XXXXX)
 
@@ -51,8 +52,17 @@ check_env:
 
 .PHONY: build_tmux
 build_tmux:
+# Note: ifeq must not be indented
+ifeq ($(PULL_BASE_IMAGE), FALSE)
 	@echo "######## BUILD TMUX ########"
 	@pushd $(TMPDIR)/tmux-static-builder && make
+else
+	@echo "######## PULL TMUX IMAGE ########"
+	# quay.io/chcollin/tmux-static-builder:latest
+	$(CONTAINER_SUBSYS) pull $(TMUX_IMAGE_REPO)/$(TMUX_IMAGE_NAME)
+	$(CONTAINER_SUBSYS) tag $(TMUX_IMAGE_REPO)/$(TMUX_IMAGE_NAME) $(TMUX_IMAGE_NAME)
+endif
+
 
 .PHONY: build_ocm_container
 build_ocm_container:
