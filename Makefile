@@ -13,7 +13,6 @@ VPN = "Raleigh (RDU2)"
 
 TMPDIR := $(shell mktemp -d /tmp/ocm-container-custom.XXXXX)
 
-
 CONTAINER_SUBSYS ?= podman
 
 CACHE ?= --no-cache
@@ -28,10 +27,12 @@ all: check_env clone build
 .PHONY: clone
 clone:
 	@echo Workdir: $(TMPDIR)
+# Note: ifeq must not be indented
+ifeq ($(PULL_BASE_IMAGE), FALSE)
 	@echo "######## CLONE TMUX BUILDER ########"
 	@echo "git@$(TMUX).git"
 	@git -C $(TMPDIR) clone --depth=1 git@$(TMUX).git
-# Note: ifeq must not be indented
+endif
 ifeq ($(PULL_BASE_IMAGE), FALSE)
 	@echo "######## CLONE OCM CONTAINER ########"
 	@echo "git@github.com:$(OCM_CONTAINER_ORG)/$(OCM_CONTAINER_REPO)"
