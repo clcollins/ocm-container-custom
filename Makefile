@@ -39,7 +39,7 @@ ifeq ($(PULL_BASE_IMAGE), FALSE)
 	@echo "git@github.com:$(OCM_CONTAINER_ORG)/$(OCM_CONTAINER_REPO)"
 	@git -C $(TMPDIR) clone --depth=1 --branch $(OCM_CONTAINER_BRANCH) git@github.com:$(OCM_CONTAINER_ORG)/$(OCM_CONTAINER_REPO).git
 endif
-	@echo "######## CLONE OCM CUSTOM ########"
+	@echo "######## CLONE OPS-SOP ########"
 	@echo "git@$(UTILS).git"
 	@git -C $(TMPDIR) clone --depth=1 git@$(UTILS).git
 
