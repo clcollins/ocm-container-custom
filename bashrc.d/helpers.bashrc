@@ -5,3 +5,5 @@ function myclusters() {
     | jq -r '.items[].name'
 }
 
+alias vi=vim
+
