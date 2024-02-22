@@ -1,6 +1,8 @@
 FROM ocm-container:latest
 MAINTAINER "Chris Collins <chris.collins@redhat.com>"
 
+RUN microdnf install --assumeyes openldap-clients
+
 # Install TMUX
 COPY --from=quay.io/chcollin/tmux:latest /tmux /usr/bin/tmux
 RUN tmux -V
