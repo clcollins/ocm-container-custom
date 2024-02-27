@@ -5,7 +5,7 @@ ORG_NAME := "chcollin"
 PARENT_ORG_NAME = "app-sre"
 
 IMAGE_NAME = "ocm-container"
-GIT_HASH := "$(shell git rev-parse HEAD | cut -c 1-8)"
+GIT_HASH := "$(shell git rev-parse --short HEAD)"
 
 TAG := ${REGISTRY_NAME}/${ORG_NAME}/${IMAGE_NAME}:${GIT_HASH}
 TAG_LATEST := ${REGISTRY_NAME}/${ORG_NAME}/${IMAGE_NAME}:latest
