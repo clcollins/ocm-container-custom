@@ -123,7 +123,7 @@ build_ocm_container:
 ifeq ($(PULL_BASE_IMAGE), FALSE)
 	@echo "######## BUILD OCM CONTAINER ########"
 	# Don't use the default build.sh script from ocm-container, because it doesn't respect pre-set CONTAINER_SUBSYS env var
-	pushd $(TMPDIR)/ocm-container && $(CONTAINER_SUBSYS) build --build-arg=${GIT_HASH} $(CACHE) -t ${TAG_LATEST} .
+	pushd $(TMPDIR)/ocm-container && $(CONTAINER_SUBSYS) build $(CACHE) -t ${TAG_LATEST} .
 else
 	@echo "######## PULL OCM CONTAINER ########"
 	$(CONTAINER_SUBSYS) pull ${REGISTRY_NAME}/${PARENT_ORG_NAME}/${IMAGE_NAME}:latest
@@ -136,7 +136,7 @@ build_custom:
 	@rsync -azv ./Dockerfile $(TMPDIR)/ops-sop/Dockerfile
 	@rsync -azv ./bashrc.d/ $(TMPDIR)/ops-sop/bashrc.d/
 	# @rsync -avz $(TMPDIR)/session-manager-plugin/bin/linux_amd64_plugin/session-manager-plugin $(TMPDIR)/ops-sop/v4/utils/ 
-	@pushd $(TMPDIR)/ops-sop/ && ${CONTAINER_SUBSYS} build $(CACHE) -t ${TAG} .
+	@pushd $(TMPDIR)/ops-sop/ && ${CONTAINER_SUBSYS} build --build-arg=${GIT_HASH} $(CACHE) -t ${TAG} .
 
 .PHONY: tag
 tag:
