@@ -1,6 +1,8 @@
 FROM ocm-container:latest
 MAINTAINER "Chris Collins <chris.collins@redhat.com>"
 
+ARG GIT_HASH="xxxxxxxx"
+
 RUN microdnf install --assumeyes openldap-clients
 
 # Install TMUX
@@ -33,3 +35,5 @@ RUN /root/.local/bin/servicelogger cache-update
 # Relative to TMPDIR
 COPY bashrc.d/* /root/.bashrc.d/
 ENV PATH "$PATH:/root/.cache/servicelogger/ops-sop/v4/utils/"
+
+RUN echo $GIT_HASH > /ocm-container-custom-version
