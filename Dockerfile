@@ -36,4 +36,5 @@ RUN /root/.local/bin/servicelogger cache-update
 COPY bashrc.d/* /root/.bashrc.d/
 ENV PATH "$PATH:/root/.cache/servicelogger/ops-sop/v4/utils/"
 
-RUN echo $GIT_HASH > /ocm-container-custom-version
+LABEL ocm_container_custom_version=${GIT_HASH}
+ENV   ocm_container_custom_version=${GIT_HASH}
