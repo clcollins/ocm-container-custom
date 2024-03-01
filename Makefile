@@ -1,5 +1,6 @@
 # IMAGE REGISTRY VARIABLES
 REGISTRY_NAME := "quay.io"
+AUTHFILE := "${HOME}/.config/quay.io/bot_auth.json"
 
 ORG_NAME := "chcollin"
 PARENT_ORG_NAME = "app-sre"
@@ -9,7 +10,6 @@ GIT_HASH := "$(shell git rev-parse --short HEAD)"
 
 TAG := ${REGISTRY_NAME}/${ORG_NAME}/${IMAGE_NAME}:${GIT_HASH}
 TAG_LATEST := ${REGISTRY_NAME}/${ORG_NAME}/${IMAGE_NAME}:latest
-
 
 TMUX_IMAGE_NAME = "tmux:latest"
 SSM_IMAGE_NAME = "aws-session-manager-plugin:latest"
