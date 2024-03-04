@@ -1,0 +1,7 @@
+*.log
+
+*.crt
+*.key
+*.pem
+
+debug*
