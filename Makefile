@@ -142,7 +142,7 @@ build_custom:
 tag:
 	@echo "######## TAG OCM CONTAINER CUSTOM ########"
 	$(CONTAINER_SUBSYS) tag ${TAG} ${TAG_LATEST}
-	$(CONTAINER_SUBSYS) tag ${TAG} ${IMAGE_NAME}
+	$(CONTAINER_SUBSYS) tag ${TAG} ${IMAGE_NAME}:latest
 
 .PHONY: push
 push:
