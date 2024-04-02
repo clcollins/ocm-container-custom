@@ -20,18 +20,6 @@ WORKDIR /
 RUN rm -r /gh
 RUN /root/.local/bin/gh --version
 
-# Install Servicelogger
-RUN mkdir /servicelogger
-WORKDIR /servicelogger
-ENV SERVICELOGGER_URL="https://api.github.com/repos/geowa4/servicelogger/releases/latest"
-RUN curl -sSLf -O $(curl -sSLf ${SERVICELOGGER_URL} -o - | jq -r '.assets[] | select(.name|test("Linux_x86_64.tar.gz$")) | .browser_download_url')
-RUN tar --extract --gunzip --no-same-owner --file *.tar.gz
-RUN mv servicelogger /root/.local/bin
-WORKDIR /
-RUN rm -r /servicelogger
-RUN /root/.local/bin/servicelogger version
-RUN /root/.local/bin/servicelogger cache-update
-
 # Relative to TMPDIR
 COPY bashrc.d/* /root/.bashrc.d/
 ENV PATH "$PATH:/root/.cache/servicelogger/ops-sop/v4/utils/"
