@@ -22,6 +22,7 @@ RUN /root/.local/bin/gh --version
 
 # Relative to TMPDIR
 COPY bashrc.d/* /root/.bashrc.d/
+COPY utils/* /root/utils/
 ENV PATH "$PATH:/root/.cache/servicelogger/ops-sop/v4/utils/"
 
 LABEL ocm_container_custom_version=${GIT_HASH}

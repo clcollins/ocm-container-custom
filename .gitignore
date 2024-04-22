@@ -5,3 +5,6 @@
 *.pem
 
 debug*
+
+# Bins
+pod2log
