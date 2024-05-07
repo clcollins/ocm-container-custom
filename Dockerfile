@@ -5,6 +5,10 @@ ARG GIT_HASH="xxxxxxxx"
 
 RUN microdnf install --assumeyes openldap-clients
 
+# Install Vault CLI
+COPY repofiles/hashicorp.repo /etc/yum.repos.d/hashicorp.repo
+RUN microdnf install --assume-yes vault
+
 # Install TMUX
 COPY --from=quay.io/chcollin/tmux:latest /tmux /usr/bin/tmux
 RUN tmux -V
