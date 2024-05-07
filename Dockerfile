@@ -5,13 +5,6 @@ ARG GIT_HASH="xxxxxxxx"
 
 RUN microdnf install --assumeyes openldap-clients
 
-# Install Vault CLI
-COPY repofiles/hashicorp.repo /etc/yum.repos.d/hashicorp.repo
-RUN microdnf install --assumeyes vault
-
-COPY ./bin/oc-dtlogs /usr/local/bin
-RUN /bin/bash -c "oc plugin list| grep oc-dtlogs"
-
 # Install TMUX
 COPY --from=quay.io/chcollin/tmux:latest /tmux /usr/bin/tmux
 RUN tmux -V
@@ -31,6 +24,13 @@ RUN /root/.local/bin/gh --version
 COPY bashrc.d/* /root/.bashrc.d/
 #COPY utils/* /root/.local/bin
 ENV PATH "$PATH:/root/.cache/servicelogger/ops-sop/v4/utils/"
+
+# Install Vault CLI
+COPY repofiles/hashicorp.repo /etc/yum.repos.d/hashicorp.repo
+RUN microdnf install --assumeyes vault
+
+COPY ./bin/oc-dtlogs /usr/local/bin
+RUN /bin/bash -c "oc plugin list| grep oc-dtlogs"
 
 LABEL ocm_container_custom_version=${GIT_HASH}
 ENV   ocm_container_custom_version=${GIT_HASH}
