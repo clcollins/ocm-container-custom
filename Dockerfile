@@ -7,7 +7,10 @@ RUN microdnf install --assumeyes openldap-clients
 
 # Install Vault CLI
 COPY repofiles/hashicorp.repo /etc/yum.repos.d/hashicorp.repo
-RUN microdnf install --assume-yes vault
+RUN microdnf install --assumeyes vault
+
+COPY ./bin/oc-dtlogs /usr/local/bin
+RUN /bin/bash -c "oc plugin list| grep oc-dtlogs"
 
 # Install TMUX
 COPY --from=quay.io/chcollin/tmux:latest /tmux /usr/bin/tmux
