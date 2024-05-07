@@ -47,7 +47,7 @@ all: isclean check_env clone build tag push
 # ALLOW_DIRTY_CHECKOUT anything other than "false" will skip this
 .PHONY: isclean
 isclean:
-ifeq ($(ALLOW_DIRTY_CHECKOUT), FALSE)
+ifneq ($(ALLOW_DIRTY_CHECKOUT), TRUE)
 	(test 0 -eq $$(git status --porcelain | wc -l)) || (echo "Local git checkout is not clean, commit changes and try again." >&2 && git --no-pager diff && exit 1)
 endif
 
@@ -56,27 +56,27 @@ endif
 check_env:
 	@if test -z "${CONTAINER_SUBSYS}" ; then echo 'CONTAINER_SUBSYS must be set. Hint: `source ~/.config/ocm-container/env.source`' ; exit 1 ; fi
 
-# Clone repositories, if PULL_BASE_IMAGE is FALSE
 .PHONY: clone
 clone: clone_tmux clone_ocm_container clone_ops_sop
 
 .PHONY: clone_tmux
 clone_tmux:
-# Note: ifeq must not be indented
-ifeq ($(PULL_BASE_IMAGE), FALSE)
+ifneq ($(PULL_BASE_IMAGE), TRUE)
 	git -C $(TMPDIR) clone --depth=1 git@$(TMUX).git
 endif
 
 .PHONY: clone_ocm_container
 clone_ocm_container:
-ifeq ($(PULL_BASE_IMAGE), FALSE)
+ifneq ($(PULL_BASE_IMAGE), TRUE)
 	@git -C $(TMPDIR) clone --depth=1 --branch $(OCM_CONTAINER_BRANCH) git@github.com:$(OCM_CONTAINER_ORG)/$(OCM_CONTAINER_REPO).git
 endif
 
 .PHONY: clone_ssm
 clone_ssm:
+ifneq ($(PULL_BASE_IMAGE), TRUE)
 	# Need to clone SSM either way, as running the image ensure the build of the bin, not the image itself
 	@git -C $(TMPDIR) clone --depth=1 git@$(SSM)
+endif
 
 .PHONY: clone_ops_sop
 clone_ops_sop:
@@ -87,8 +87,7 @@ build: build_tmux build_ocm_container build_custom
 
 .PHONY: build_tmux
 build_tmux:
-# Note: ifeq must not be indented
-ifeq ($(PULL_BASE_IMAGE), FALSE)
+ifneq ($(PULL_BASE_IMAGE), TRUE)
 	@pushd $(TMPDIR)/tmux-static-builder && make
 else
 	# podman pull "quay.io"/"chcollin"/"tmux:latest"
@@ -98,8 +97,7 @@ endif
 
 .PHONY: build_ssm
 build_ssm:
-# Note: ifeq must not be indented
-ifeq ($(PULL_BASE_IMAGE), FALSE)
+ifneq ($(PULL_BASE_IMAGE), TRUE)
 	@pushd $(TMPDIR)/session-manager-plugin && $(CONTAINER_SUBSYS) build -f Dockerfile -t ${REGISTRY_NAME}/${ORG_NAME}/${SSM_IMAGE_NAME} .
 else
 	$(CONTAINER_SUBSYS) pull ${REGISTRY_NAME}/${ORG_NAME}/${SSM_IMAGE_NAME}
@@ -110,8 +108,7 @@ endif
 
 .PHONY: build_ocm_container
 build_ocm_container:
-# Note: ifeq must not be indented
-ifeq ($(PULL_BASE_IMAGE), FALSE)
+ifneq ($(PULL_BASE_IMAGE), TRUE)
 	pushd $(TMPDIR)/ocm-container && $(CONTAINER_SUBSYS) build $(CACHE) -t ${TAG_LATEST} .
 	$(CONTAINER_SUBSYS) tag ${TAG_LATEST} ${IMAGE_NAME}:latest
 else
