@@ -26,3 +26,6 @@ post-seccomp-servicelog() {
   osdctl servicelog post -t $SERVICE_LOG $1
 }
 
+delete-packageserver-csv() {
+  oc delete csv -n openshift-operator-lifecycle-manager packageserver
+}
