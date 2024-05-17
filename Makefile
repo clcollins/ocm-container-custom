@@ -132,3 +132,7 @@ tag:
 push:
 	$(CONTAINER_SUBSYS) push ${TAG} --authfile=$(HOME)/.config/quay.io/bot_auth.json
 	$(CONTAINER_SUBSYS) push ${TAG_LATEST} --authfile=$(HOME)/.config/quay.io/bot_auth.json
+
+.PHONY: pull
+pull:
+	$(CONTAINER_SUBSYS) pull $(REGISTRY_NAME)/$(ORG_NAME)/$(IMAGE_NAME):latest
