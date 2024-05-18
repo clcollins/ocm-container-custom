@@ -10,6 +10,7 @@ GIT_HASH := "$(shell git rev-parse --short HEAD)"
 
 TAG := ${REGISTRY_NAME}/${ORG_NAME}/${IMAGE_NAME}:${GIT_HASH}
 TAG_LATEST := ${REGISTRY_NAME}/${ORG_NAME}/${IMAGE_NAME}:latest
+TAG_LATEST_MINIMAL := ${REGISTRY_NAME}/${ORG_NAME}/${IMAGE_NAME}-minimal:latest
 
 TMUX_IMAGE_NAME = "tmux:latest"
 SSM_IMAGE_NAME = "aws-session-manager-plugin:latest"
@@ -109,8 +110,8 @@ endif
 .PHONY: build_ocm_container
 build_ocm_container:
 ifneq ($(PULL_BASE_IMAGE), TRUE)
-	pushd $(TMPDIR)/ocm-container && $(CONTAINER_SUBSYS) build $(CACHE) -t ${TAG_LATEST} .
-	$(CONTAINER_SUBSYS) tag ${TAG_LATEST} ${IMAGE_NAME}:latest
+	pushd $(TMPDIR)/ocm-container && make build-minimal
+	$(CONTAINER_SUBSYS) tag ${TAG_LATEST_MINIMAL} ${IMAGE_NAME}:latest
 else
 	# podman pull "quay.io"/"app-sre"/"ocm-container":latest
 	$(CONTAINER_SUBSYS) pull ${REGISTRY_NAME}/${PARENT_ORG_NAME}/${IMAGE_NAME}:latest
