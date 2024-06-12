@@ -1,5 +1,5 @@
 # Install GH
-FROM registry.access.redhat.com/ubi9/ubi-minimal:9 as builder
+FROM registry.access.redhat.com/ubi9/ubi-minimal:9.3-1612 as builder
 RUN microdnf install --assumeyes jq tar gzip
 RUN mkdir /gh
 WORKDIR /gh
