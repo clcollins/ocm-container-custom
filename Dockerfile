@@ -9,6 +9,7 @@ RUN tar --extract --gunzip --no-same-owner --strip-components=2 --file *.tar.gz
 
 FROM ocm-container:latest 
 MAINTAINER "Chris Collins <chris.collins@redhat.com>"
+ENV BIN_DIR "/usr/local/bin"
 
 ARG GIT_HASH="xxxxxxxx"
 
