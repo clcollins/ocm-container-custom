@@ -110,7 +110,7 @@ endif
 .PHONY: build_ocm_container
 build_ocm_container:
 ifneq ($(PULL_BASE_IMAGE), TRUE)
-	pushd $(TMPDIR)/ocm-container && make build-minimal
+	pushd $(TMPDIR)/ocm-container && make build
 	$(CONTAINER_SUBSYS) tag ${TAG_LATEST} ${IMAGE_NAME}:latest
 else
 	# podman pull "quay.io"/"app-sre"/"ocm-container":latest
