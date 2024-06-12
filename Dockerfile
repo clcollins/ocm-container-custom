@@ -3,7 +3,7 @@ MAINTAINER "Chris Collins <chris.collins@redhat.com>"
 
 ARG GIT_HASH="xxxxxxxx"
 
-RUN microdnf install --assumeyes openldap-clients
+RUN microdnf install --assumeyes openldap-clients jq
 
 # Install TMUX
 COPY --from=quay.io/chcollin/tmux:latest /tmux /usr/bin/tmux
