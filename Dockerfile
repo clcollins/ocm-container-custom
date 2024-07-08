@@ -3,9 +3,19 @@ FROM registry.access.redhat.com/ubi9/ubi-minimal:9.3-1612 as builder
 RUN microdnf install --assumeyes jq tar gzip
 RUN mkdir /gh
 WORKDIR /gh
-ENV GH_URL="https://api.github.com/repos/cli/cli/releases/latest"
-RUN curl -sSLf -O $(curl -sSLf ${GH_URL} -o - | jq -r '.assets[] | select(.name|test("linux_amd64.tar.gz$")) | .browser_download_url')
-RUN tar --extract --gunzip --no-same-owner --strip-components=2 --file *.tar.gz
+ENV BIN_URL="https://api.github.com/repos/cli/cli/releases/latest"
+ENV BIN_SELECTOR='linux_amd64.tar.gz$'
+ENV BIN_ASSET="gh.tar.gz"
+RUN curl -o ${BIN_ASSET} -sSLf -O $(curl -sSLf ${BIN_URL} -o - | jq -r --arg SELECTOR "$BIN_SELECTOR" '.assets[] | select(.name|test($SELECTOR)) | .browser_download_url')
+RUN tar --extract --gunzip --no-same-owner --strip-components=2 --file ${BIN_ASSET}
+
+RUN mkdir /mirrosa
+WORKDIR /mirrosa
+ENV BIN_URL="https://api.github.com/repos/mjlshen/mirrosa/releases/latest"
+ENV BIN_SELECTOR='linux_amd64$'
+ENV BIN_ASSET="mirrosa"
+RUN curl -o ${BIN_ASSET} -sSLf -O $(curl -sSLf ${BIN_URL} -o - | jq -r --arg SELECTOR "$BIN_SELECTOR" '.assets[] | select(.name|test($SELECTOR)) | .browser_download_url')
+RUN chmod +x ${BIN_ASSET}
 
 FROM ocm-container:latest 
 MAINTAINER "Chris Collins <chris.collins@redhat.com>"
@@ -22,6 +32,10 @@ RUN tmux -V
 # Install GH
 COPY --from=builder /gh/gh ${BIN_DIR}
 RUN gh --version
+
+# Install Mirrosa
+COPY --from=builder /mirrosa/mirrosa ${BIN_DIR}
+RUN mirrosa -h
 
 # Relative to TMPDIR
 RUN mkdir -p /root/.bashrc.d
