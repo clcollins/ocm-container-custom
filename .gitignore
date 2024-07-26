@@ -8,5 +8,6 @@ debug*
 
 
 # Bins
-bin/pod2log
+bin/oc-pod2log
 bin/oc-dtlogs
+
