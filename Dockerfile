@@ -47,7 +47,7 @@ ENV PATH "$PATH:/root/.cache/servicelogger/ops-sop/v4/utils/"
 
 # Install Vault CLI
 COPY repofiles/hashicorp.repo /etc/yum.repos.d/hashicorp.repo
-RUN microdnf install --assumeyes vault
+RUN microdnf install --assumeyes vault terraform
 
 COPY ./bin/oc-dtlogs /usr/local/bin
 RUN /bin/bash -c "oc plugin list| grep oc-dtlogs"
