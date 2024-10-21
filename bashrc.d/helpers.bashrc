@@ -7,3 +7,6 @@ function myclusters() {
 
 alias vi=vim
 
+alias listhive="ocm get clusters --parameter search=\"name like 'hivep0%'\" | jq -r '.items[] | .display_name'"
+alias listhives="ocm get clusters --parameter search=\"name like 'hivep0%'\" | jq -r '.items[] | .display_name'"
+
