@@ -49,6 +49,10 @@ ENV PATH "$PATH:/root/.cache/servicelogger/ops-sop/v4/utils/"
 COPY repofiles/hashicorp.repo /etc/yum.repos.d/hashicorp.repo
 RUN microdnf install --assumeyes vault terraform
 
+# Install Google Cloud CLI
+COPY repofiles/google-cloud-cli.repo /etc/yum.repos.d/google-cloud-cli.repo
+RUN microdnf install --assumeyes google-cloud-cli
+
 COPY ./bin/oc-dtlogs /usr/local/bin
 RUN /bin/bash -c "oc plugin list| grep oc-dtlogs"
 
