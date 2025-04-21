@@ -53,8 +53,8 @@ RUN microdnf install --assumeyes vault terraform
 COPY repofiles/google-cloud-cli.repo /etc/yum.repos.d/google-cloud-cli.repo
 RUN microdnf install --assumeyes google-cloud-cli
 
-COPY ./bin/oc-dtlogs /usr/local/bin
-RUN /bin/bash -c "oc plugin list| grep oc-dtlogs"
+#COPY ./bin/oc-dtlogs /usr/local/bin
+#RUN /bin/bash -c "oc plugin list| grep oc-dtlogs"
 
 LABEL ocm_container_custom_version=${GIT_HASH}
 ENV   ocm_container_custom_version=${GIT_HASH}
