@@ -8,5 +8,5 @@ if [ -n "$CLUSTER_ID" -a -z "$SKIP_CLUSTER_CONTEXT" ]; then
 	fi
 
 	echo "Checking the context on $CLUSTER_ID"
-	osdctl cluster context "$CLUSTER_ID"
+	osdctl cluster context --cluster-id "$CLUSTER_ID"
 fi
