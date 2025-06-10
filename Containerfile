@@ -17,7 +17,7 @@ ENV BIN_ASSET="mirrosa"
 RUN curl -o ${BIN_ASSET} -sSLf -O $(curl -sSLf ${BIN_URL} -o - | jq -r --arg SELECTOR "$BIN_SELECTOR" '.assets[] | select(.name|test($SELECTOR)) | .browser_download_url')
 RUN chmod +x ${BIN_ASSET}
 
-FROM ocm-container:latest 
+FROM quay.io/app-sre/ocm-container:latest
 MAINTAINER "Chris Collins <chris.collins@redhat.com>"
 ENV BIN_DIR "/usr/local/bin"
 
