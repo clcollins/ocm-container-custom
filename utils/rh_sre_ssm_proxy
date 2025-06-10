@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+trap "oc delete po rh-sre-ssm-proxy" TERM EXIT
+
+
+if [ "${OCMC_ENGINE}" != "podman" ]
+then
+  echo "Cluster console inside OCM Container is currently only supported with Podman"
+  exit 1
+fi
+
+if [ "${OCMC_DISABLE_CONSOLE_PORT}" == "true " ]
+then
+  echo "Cluster console port disabled: OCMC_DISABLE_CONSOLE_PORT == true"
+  exit 1
+fi
+
+# if the file doesn't exist, or is empty, exit
+if [ ! -f /tmp/portmap ] || [ ! -s /tmp/portmap ]
+then
+  echo "External port not mapped for cluster console, exiting..."
+  exit 1
+fi
+
+ocm-backplane elevate -n -- run rh-sre-ssm-proxy --image=quay.io/chcollin/http-simple-proxy:latest \
+        --env="FORWARD_PROT=http" \
+        --env="FORWARD_HOST=hypershift-monitoring-stack-prometheus.openshift-observability-operator.svc.cluster.local" \
+        --env="FORWARD_PORT=9090" \
+        --env="PROXY_READ_TIMEOUT=3600" \
+        --overrides='{"apiVersion": "v1", "spec": {"nodeSelector": { "node-role.kubernetes.io/master": "" }, "tolerations" : [{"effect": "NoSchedule","key": "node-role.kubernetes.io/master", "operator": "Exists"}]}}'
+
+oc wait --for=condition=Ready pod/rh-sre-ssm-proxy
+
+oc port-forward rh-sre-ssm-proxy --address 0.0.0.0 9999:80
+
