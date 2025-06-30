@@ -9,7 +9,9 @@ IMAGE_NAME = "ocm-container"
 GIT_HASH := "$(shell git rev-parse --short HEAD)"
 
 TAG := ${REGISTRY_NAME}/${ORG_NAME}/${IMAGE_NAME}:${GIT_HASH}
+TAG_MICRO := ${REGISTRY_NAME}/${ORG_NAME}/${IMAGE_NAME}-micro:${GIT_HASH}
 TAG_LATEST := ${REGISTRY_NAME}/${ORG_NAME}/${IMAGE_NAME}:latest
+TAG_MICRO_LATEST := ${REGISTRY_NAME}/${ORG_NAME}/${IMAGE_NAME}-micro:latest
 # TAG_LATEST_MINIMAL := ${REGISTRY_NAME}/${ORG_NAME}/${IMAGE_NAME}-minimal:latest
 
 TMUX_IMAGE_NAME = "tmux:latest"
@@ -43,6 +45,9 @@ default: all
 
 .PHONY: all
 all: isclean check_env clone build tag push
+
+.PHONY: micro
+micro: isclean check_env clone_ocm_container build_ocm_container_micro tag_micro push_micro
 
 # Check that the git checkout is not dirty
 # ALLOW_DIRTY_CHECKOUT anything other than "false" will skip this
@@ -89,7 +94,7 @@ build: build_tmux build_ocm_container build_custom
 .PHONY: build_tmux
 build_tmux:
 ifneq ($(PULL_BASE_IMAGE), TRUE)
-	@pushd $(TMPDIR)/tmux-static-builder && make
+	@pushd $(TMPDIR)/tmux-static-builder && make BUILD_ARGS="--build-arg=GITHUB_TOKEN=${GITHUB_TOKEN}"
 else
 	# podman pull "quay.io"/"chcollin"/"tmux:latest"
 	$(CONTAINER_SUBSYS) pull ${REGISTRY_NAME}/${ORG_NAME}/${TMUX_IMAGE_NAME}
@@ -99,7 +104,7 @@ endif
 .PHONY: build_ssm
 build_ssm:
 ifneq ($(PULL_BASE_IMAGE), TRUE)
-	@pushd $(TMPDIR)/session-manager-plugin && $(CONTAINER_SUBSYS) build -f Dockerfile -t ${REGISTRY_NAME}/${ORG_NAME}/${SSM_IMAGE_NAME} .
+	@pushd $(TMPDIR)/session-manager-plugin && $(CONTAINER_SUBSYS) build BUILD_ARGS="--build-arg=GITHUB_TOKEN=${GITHUB_TOKEN}" -f Dockerfile -t ${REGISTRY_NAME}/${ORG_NAME}/${SSM_IMAGE_NAME} .
 else
 	$(CONTAINER_SUBSYS) pull ${REGISTRY_NAME}/${ORG_NAME}/${SSM_IMAGE_NAME}
 	$(CONTAINER_SUBSYS) tag ${REGISTRY_NAME}/${ORG_NAME}/${SSM_IMAGE_NAME} ${SSM_IMAGE_NAME}
@@ -110,19 +115,23 @@ endif
 .PHONY: build_ocm_container
 build_ocm_container:
 ifneq ($(PULL_BASE_IMAGE), TRUE)
-	pushd $(TMPDIR)/ocm-container && make build
+	pushd $(TMPDIR)/ocm-container && make build BUILD_ARGS="--build-arg=GITHUB_TOKEN=${GITHUB_TOKEN}"
 	$(CONTAINER_SUBSYS) tag ${TAG_LATEST} ${IMAGE_NAME}:latest
 else
-	# podman pull "quay.io"/"app-sre"/"ocm-container":latest
 	$(CONTAINER_SUBSYS) pull ${REGISTRY_NAME}/${PARENT_ORG_NAME}/${IMAGE_NAME}:latest
 	$(CONTAINER_SUBSYS) tag ${REGISTRY_NAME}/${PARENT_ORG_NAME}/${IMAGE_NAME}:latest ${IMAGE_NAME}:latest
 endif
+
+.PHONY: build_ocm_contianer_micro
+build_ocm_container_micro:
+	pushd $(TMPDIR)/ocm-container && make build-micro BUILD_ARGS="--build-arg=GITHUB_TOKEN=${GITHUB_TOKEN}"
+	$(CONTAINER_SUBSYS) tag ${TAG_MICRO_LATEST} ${IMAGE_NAME}-micro:latest
 
 .PHONY: build_custom
 build_custom:
 	@rsync -azv ./ $(TMPDIR)/ops-sop/
 	# @rsync -avz $(TMPDIR)/session-manager-plugin/bin/linux_amd64_plugin/session-manager-plugin $(TMPDIR)/ops-sop/v4/utils/ 
-	@pushd $(TMPDIR)/ops-sop/ && ${CONTAINER_SUBSYS} build --build-arg=GIT_HASH=${GIT_HASH} $(CACHE) -t ${TAG} .
+	@pushd $(TMPDIR)/ops-sop/ && ${CONTAINER_SUBSYS} build --build-arg=GITHUB_TOKEN=${GITHUB_TOKEN} --build-arg=GIT_HASH=${GIT_HASH} $(CACHE) -t ${TAG} .
 
 .PHONY: tag
 tag:
@@ -134,6 +143,10 @@ push:
 	$(CONTAINER_SUBSYS) push ${TAG} --authfile=$(HOME)/.config/quay.io/bot_auth.json
 	$(CONTAINER_SUBSYS) push ${TAG_LATEST} --authfile=$(HOME)/.config/quay.io/bot_auth.json
 
+.PHONY: push_micro
+push_micro:
+	$(CONTAINER_SUBSYS) push ${TAG_MICRO} --authfile=$(HOME)/.config/quay.io/bot_auth.json
+	$(CONTAINER_SUBSYS) push ${TAG_MICRO_LATEST} --authfile=$(HOME)/.config/quay.io/bot_auth.json
 .PHONY: pull
 pull:
 	$(CONTAINER_SUBSYS) pull $(REGISTRY_NAME)/$(ORG_NAME)/$(IMAGE_NAME):latest
