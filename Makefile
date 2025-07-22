@@ -115,7 +115,7 @@ endif
 .PHONY: build_ocm_container
 build_ocm_container:
 ifneq ($(PULL_BASE_IMAGE), TRUE)
-	pushd $(TMPDIR)/ocm-container && make build BUILD_ARGS="--build-arg=GITHUB_TOKEN=${GITHUB_TOKEN}"
+	pushd $(TMPDIR)/ocm-container && make BUILD_ARGS="--build-arg=GITHUB_TOKEN=${GITHUB_TOKEN}"
 	$(CONTAINER_SUBSYS) tag ${TAG_LATEST} ${IMAGE_NAME}:latest
 else
 	$(CONTAINER_SUBSYS) pull ${REGISTRY_NAME}/${PARENT_ORG_NAME}/${IMAGE_NAME}:latest
