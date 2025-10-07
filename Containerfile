@@ -24,7 +24,8 @@ ENV BIN_DIR "/usr/local/bin"
 
 ARG GIT_HASH="xxxxxxxx"
 
-RUN dnf install --assumeyes openldap-clients jq tar gzip
+RUN dnf install --assumeyes openldap-clients jq tar gzip krb5-devel python3-devel clang
+RUN python3 -m pip install rh-aws-saml-login
 
 # Install TMUX
 COPY --from=quay.io/chcollin/tmux:latest /tmux ${BIN_DIR}
