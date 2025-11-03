@@ -16,9 +16,9 @@ RUN tar --extract --gunzip --no-same-owner --strip-components=2 --file ${BIN_ASS
 FROM quay.io/app-sre/ocm-container:latest
 MAINTAINER "Chris Collins <chris.collins@redhat.com>"
 
-ARG BIN_DIR "/usr/local/bin"
-ARG PKGS "openldap-clients jq tar gzip krb5-devel python3-devel clang nodejs-npm"
-ARG NPM_PKGS "@anthropic-ai/claude-code@latest"
+ARG BIN_DIR="/usr/local/bin"
+ARG PKGS="openldap-clients jq tar gzip krb5-devel python3-devel clang nodejs-npm"
+ARG NPM_PKGS="@anthropic-ai/claude-code@latest"
 
 ARG GIT_HASH="xxxxxxxx"
 
@@ -33,9 +33,9 @@ RUN python3 -m pip install rh-aws-saml-login
 RUN npm install -g $NPM_PKGS
 
 # Install Google Coud CLI
-ARG GCLOUD_CLI "https://packages.cloud.google.com/yum/repos/cloud-sdk-el9-x86_64"
-ARG GCLOUD_CLI_REPO_NAME "google-cloud-cli"
-ARG GCLOUD_KEYS "https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg"
+ARG GCLOUD_CLI="https://packages.cloud.google.com/yum/repos/cloud-sdk-el9-x86_64"
+ARG GCLOUD_CLI_REPO_NAME="google-cloud-cli"
+ARG GCLOUD_KEYS="https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg"
 
 ADD repofiles/google-cloud-cli.repo /etc/yum.repos.d/google-cloud-cli.repo
 
