@@ -7,18 +7,18 @@ RUN dnf install --assumeyes jq tar gzip
 # GH CLI
 RUN mkdir /gh
 WORKDIR /gh
-ENV BIN_URL="https://api.github.com/repos/cli/cli/releases/latest"
-ENV BIN_SELECTOR='linux_amd64.tar.gz$'
-ENV BIN_ASSET="gh.tar.gz"
+ARG BIN_URL="https://api.github.com/repos/cli/cli/releases/latest"
+ARG BIN_SELECTOR='linux_amd64.tar.gz$'
+ARG BIN_ASSET="gh.tar.gz"
 RUN curl -o ${BIN_ASSET} -sSLf -O $(curl -sSLf ${BIN_URL} -o - | jq -r --arg SELECTOR "$BIN_SELECTOR" '.assets[] | select(.name|test($SELECTOR)) | .browser_download_url')
 RUN tar --extract --gunzip --no-same-owner --strip-components=2 --file ${BIN_ASSET}
 
 FROM quay.io/app-sre/ocm-container:latest
 MAINTAINER "Chris Collins <chris.collins@redhat.com>"
 
-ENV BIN_DIR "/usr/local/bin"
-ENV PKGS "openldap-clients jq tar gzip krb5-devel python3-devel clang nodejs-npm"
-ENV NPM_PKGS "@anthropic-ai/claude-code@latest"
+ARG BIN_DIR "/usr/local/bin"
+ARG PKGS "openldap-clients jq tar gzip krb5-devel python3-devel clang nodejs-npm"
+ARG NPM_PKGS "@anthropic-ai/claude-code@latest"
 
 ARG GIT_HASH="xxxxxxxx"
 
@@ -33,9 +33,9 @@ RUN python3 -m pip install rh-aws-saml-login
 RUN npm install -g $NPM_PKGS
 
 # Install Google Coud CLI
-ENV GCLOUD_CLI "https://packages.cloud.google.com/yum/repos/cloud-sdk-el9-x86_64"
-ENV GCLOUD_CLI_REPO_NAME "google-cloud-cli"
-ENV GCLOUD_KEYS "https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg"
+ARG GCLOUD_CLI "https://packages.cloud.google.com/yum/repos/cloud-sdk-el9-x86_64"
+ARG GCLOUD_CLI_REPO_NAME "google-cloud-cli"
+ARG GCLOUD_KEYS "https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg"
 
 ADD repofiles/google-cloud-cli.repo /etc/yum.repos.d/google-cloud-cli.repo
 
@@ -62,7 +62,6 @@ COPY bashrc.d/* /root/.bashrc.d/
 
 RUN mkdir -p /root/.local/bin
 COPY utils/* /root/.local/bin
-ENV PATH "$PATH:/root/.cache/servicelogger/ops-sop/v4/utils/"
 
 # NO RHEL10 REPO YET
 ## Install Vault CLI
