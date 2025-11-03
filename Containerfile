@@ -30,12 +30,6 @@ RUN dnf install --assumeyes 'dnf-command(config-manager)' \
 RUN python3 -m pip install rh-aws-saml-login
 
 # Claude Code
-ENV CLAUDE_CODE_USE_VERTEX 1
-ENV CLOUD_ML_REGION us-east5
-
-# Supply at startup
-ARG GCP_PROJECT_ID supply-at-runtime
-
 RUN npm install -g $NPM_PKGS
 
 # Install Google Coud CLI
