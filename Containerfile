@@ -56,6 +56,17 @@ RUN tmux -V
 COPY --from=builder /gh/gh ${BIN_DIR}
 RUN gh --version
 
+# Add Glow
+ARG CHARM_REPO_NAME="charm"
+ARG CHARM_KEYS="https://repo.charm.sh/yum/gpg.key"
+
+ADD repofiles/charm.repo /etc/yum.repos.d/charm.repo
+
+RUN rpm --import $GCLOUD_KEYS \
+    && dnf install --assumeyes --enablerepo=${CHARM_REPO_NAME} glow \
+    && dnf clean all \
+    && rm --recursive --force /var/cache/yum/
+
 # Relative to TMPDIR
 RUN mkdir -p /root/.bashrc.d
 COPY bashrc.d/* /root/.bashrc.d/
