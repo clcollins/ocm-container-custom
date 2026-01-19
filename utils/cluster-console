@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+# if the file doesn't exist, or is empty, exit
+if [ ! -f /tmp/portmap ] || [ ! -s /tmp/portmap ]
+then
+  echo "External port not mapped for cluster console, exiting..."
+  exit 1
+fi
+
+exec ocm backplane console --port $OCM_BACKPLANE_CONSOLE_PORT \
+  | sed "s/${OCM_BACKPLANE_CONSOLE_PORT}/$(cat /tmp/portmap)/"
