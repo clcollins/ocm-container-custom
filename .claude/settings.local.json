@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(test $OCM_CONTAINER -eq 1)",
+      "Bash(podman ps:*)",
+      "Bash(oc get:*)",
+      "Bash(oc list:*)",
+      "Bash(ocm get:*)",
+      "Bash(ocm describe:*)",
+      "Bash(aws sts get-caller-identity:*)",
+      "Bash(aws ec2 describe-instances:*)",
+      "Bash(aws cloudtraili lookup-events:*)"
+    ],
+    "deny": [
+      "Bash(oc apply:*)",
+      "Bash(oc edit:*)",
+      "Bash(oc patch:*)",
+      "Bash(oc delete:*)"
+    ],
+    "ask": []
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ \"${OCM_CONTAINER}\" = \"1\" ]; then echo '🔴 OCM-Container Environment - Operational Tasks Mode (read-only cluster access)'; elif [ -n \"${TOOLBOX_PATH}\" ]; then echo '🔧 Toolbox Development Environment - Development Tasks Mode'; else echo '❓ Unknown Environment'; fi"
+          }
+        ]
+      }
+    ]
+  }
+}
