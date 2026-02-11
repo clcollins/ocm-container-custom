@@ -15,6 +15,30 @@ $ source ~/.config/ocm-container/env.source
 $ make
 ```
 
+## osdctl Binary Extraction
+
+The build process automatically extracts the `osdctl` binary from the container image to your local machine for use in your host/toolbox environment.
+
+After running `make`, the `osdctl` binary will be:
+- Extracted from the container image at `/usr/local/bin/osdctl`
+- Copied to `~/.local/bin/osdctl` on your host machine
+- Verified by running `osdctl version`
+
+This allows you to use the same version of `osdctl` on both your host/toolbox and inside the ocm-container, ensuring consistency across your workflow.
+
+**Note:** Ensure `~/.local/bin` is in your `$PATH` to use the extracted binary:
+
+```shell
+# Add to your ~/.bashrc if not already present
+export PATH="$HOME/.local/bin:$PATH"
+```
+
+To manually extract the binary without rebuilding everything:
+
+```shell
+make extract-osdctl
+```
+
 ## Claude Code Integration
 
 This container includes [Claude Code](https://claude.ai/claude-code), Anthropic's AI-powered coding assistant, installed via a secure multi-stage build process.

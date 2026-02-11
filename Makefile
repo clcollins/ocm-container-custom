@@ -44,7 +44,7 @@ ALLOW_DIRTY_CHECKOUT ?= FALSE
 default: all
 
 .PHONY: all
-all: isclean check_env clone build tag push
+all: isclean check_env clone build tag push extract-osdctl
 
 .PHONY: micro
 micro: isclean check_env clone_ocm_container build_ocm_container_micro tag_micro push_micro
@@ -176,3 +176,15 @@ update-claude-version:
 	echo "  BUILD_DATE: $${BUILD_DATE}" && \
 	echo "" && \
 	echo "Please review the changes with 'git diff Containerfile'"
+
+.PHONY: extract-osdctl
+extract-osdctl:
+	@echo "Extracting osdctl binary from container image..."
+	@mkdir -p ~/.local/bin
+	@CONTAINER_ID=$$($(CONTAINER_SUBSYS) create ${IMAGE_NAME}:latest) && \
+	$(CONTAINER_SUBSYS) cp $${CONTAINER_ID}:/usr/local/bin/osdctl ~/.local/bin/osdctl && \
+	$(CONTAINER_SUBSYS) rm $${CONTAINER_ID}
+	@chmod +x ~/.local/bin/osdctl
+	@echo "✅ osdctl extracted to ~/.local/bin/osdctl"
+	@echo "Running osdctl version..."
+	@~/.local/bin/osdctl version
