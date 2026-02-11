@@ -150,3 +150,29 @@ push_micro:
 .PHONY: pull
 pull:
 	$(CONTAINER_SUBSYS) pull $(REGISTRY_NAME)/$(ORG_NAME)/$(IMAGE_NAME):latest
+
+# Claude Code version management
+.PHONY: update-claude-version
+update-claude-version:
+	@echo "Fetching latest Claude Code version information..."
+	@CLAUDE_GCS_BUCKET="https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases" && \
+	CLAUDE_PLATFORM="linux-x64" && \
+	CLAUDE_VERSION=$$(curl -fsSL "$${CLAUDE_GCS_BUCKET}/latest") && \
+	echo "Latest version: $${CLAUDE_VERSION}" && \
+	MANIFEST_JSON=$$(curl -fsSL "$${CLAUDE_GCS_BUCKET}/$${CLAUDE_VERSION}/manifest.json") && \
+	CLAUDE_CHECKSUM=$$(echo "$${MANIFEST_JSON}" | jq -r ".platforms[\"$${CLAUDE_PLATFORM}\"].checksum") && \
+	BUILD_DATE=$$(echo "$${MANIFEST_JSON}" | jq -r ".buildDate") && \
+	echo "Checksum: $${CLAUDE_CHECKSUM}" && \
+	echo "Build date: $${BUILD_DATE}" && \
+	echo "Updating Containerfile..." && \
+	sed -i "s/^ARG CLAUDE_VERSION=.*/ARG CLAUDE_VERSION=\"$${CLAUDE_VERSION}\"/" Containerfile && \
+	sed -i "s/^ARG CLAUDE_CHECKSUM=.*/ARG CLAUDE_CHECKSUM=\"$${CLAUDE_CHECKSUM}\"/" Containerfile && \
+	sed -i "s/# Version .* released .*/# Version $${CLAUDE_VERSION} released $${BUILD_DATE}/" Containerfile && \
+	echo "✅ Containerfile updated successfully" && \
+	echo "" && \
+	echo "Updated values:" && \
+	echo "  CLAUDE_VERSION: $${CLAUDE_VERSION}" && \
+	echo "  CLAUDE_CHECKSUM: $${CLAUDE_CHECKSUM}" && \
+	echo "  BUILD_DATE: $${BUILD_DATE}" && \
+	echo "" && \
+	echo "Please review the changes with 'git diff Containerfile'"

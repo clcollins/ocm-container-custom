@@ -74,6 +74,9 @@ COPY bashrc.d/* /root/.bashrc.d/
 RUN mkdir -p /root/.local/bin
 COPY utils/* /root/.local/bin
 
+# Tmux configuration
+COPY .tmux.conf /root/.tmux.conf
+
 # NO RHEL10 REPO YET
 ## Install Vault CLI
 #RUN dnf config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
