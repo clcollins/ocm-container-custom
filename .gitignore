@@ -11,3 +11,4 @@ debug*
 bin/oc-pod2log
 bin/oc-dtlogs
 
+NON_ROOT_MIGRATION_PLAN.md
