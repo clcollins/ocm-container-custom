@@ -16,14 +16,14 @@ RUN tar --extract --gunzip --no-same-owner --strip-components=2 --file ${BIN_ASS
 # Claude Code Builder
 FROM quay.io/app-sre/ocm-container:latest as claude-builder
 
-# Version 1.15.0 released 2025-02-10T20:14:17.000Z
-ARG CLAUDE_VERSION="1.15.0"
-ARG CLAUDE_CHECKSUM="c1c5e54e1da4f37a70fb8c6c24a5f9e4f12e44aba0ffaddb7d6c0c02e4e8abf0"
+# Version 2.1.39 released 2026-02-10T21:13:30Z
+ARG CLAUDE_VERSION="2.1.39"
+ARG CLAUDE_CHECKSUM="68e4775b293d95e06d168581c523fc5c1523968179229d31a029f285b2aceaff"
 ARG CLAUDE_PLATFORM="linux-x64"
 ARG CLAUDE_GCS_BUCKET="https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases"
 
 # Download and verify Claude Code binary
-ADD ${CLAUDE_GCS_BUCKET}/${CLAUDE_VERSION}/claude-code-${CLAUDE_PLATFORM} /tmp/claude
+ADD ${CLAUDE_GCS_BUCKET}/${CLAUDE_VERSION}/${CLAUDE_PLATFORM}/claude /tmp/claude
 RUN echo "${CLAUDE_CHECKSUM}  /tmp/claude" | sha256sum --check --status && \
     chmod +x /tmp/claude
 
