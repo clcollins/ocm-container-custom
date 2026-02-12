@@ -13,24 +13,34 @@ ARG BIN_ASSET="gh.tar.gz"
 RUN curl -o ${BIN_ASSET} -sSLf -O $(curl -sSLf ${BIN_URL} -o - | jq -r --arg SELECTOR "$BIN_SELECTOR" '.assets[] | select(.name|test($SELECTOR)) | .browser_download_url')
 RUN tar --extract --gunzip --no-same-owner --strip-components=2 --file ${BIN_ASSET}
 
+# Claude Code Builder
+FROM quay.io/app-sre/ocm-container:latest as claude-builder
+
+# Version 1.15.0 released 2025-02-10T20:14:17.000Z
+ARG CLAUDE_VERSION="1.15.0"
+ARG CLAUDE_CHECKSUM="c1c5e54e1da4f37a70fb8c6c24a5f9e4f12e44aba0ffaddb7d6c0c02e4e8abf0"
+ARG CLAUDE_PLATFORM="linux-x64"
+ARG CLAUDE_GCS_BUCKET="https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases"
+
+# Download and verify Claude Code binary
+ADD ${CLAUDE_GCS_BUCKET}/${CLAUDE_VERSION}/claude-code-${CLAUDE_PLATFORM} /tmp/claude
+RUN echo "${CLAUDE_CHECKSUM}  /tmp/claude" | sha256sum --check --status && \
+    chmod +x /tmp/claude
+
 FROM quay.io/app-sre/ocm-container:latest
 MAINTAINER "Chris Collins <chris.collins@redhat.com>"
 
 ARG BIN_DIR="/usr/local/bin"
 ARG PKGS="openldap-clients jq tar gzip krb5-devel python3-devel clang nodejs-npm"
-ARG NPM_PKGS="@anthropic-ai/claude-code@latest"
 
 ARG GIT_HASH="xxxxxxxx"
 
 RUN dnf install --assumeyes 'dnf-command(config-manager)' \
-    && dnf install --assumeyes openldap-clients jq tar gzip krb5-devel python3-devel clang nodejs-npm \
+    && dnf install --assumeyes openldap-clients jq tar gzip krb5-devel python3-devel clang \ 
     && dnf clean all \
     && rm --recursive --force /var/cache/yum/
 
 RUN python3 -m pip install rh-aws-saml-login
-
-# Claude Code
-RUN npm install -g $NPM_PKGS
 
 # Install Google Coud CLI
 ARG GCLOUD_CLI="https://packages.cloud.google.com/yum/repos/cloud-sdk-el9-x86_64"
@@ -55,6 +65,10 @@ RUN tmux -V
 # Install GH
 COPY --from=builder /gh/gh ${BIN_DIR}
 RUN gh --version
+
+# Install Claude Code
+COPY --from=claude-builder /tmp/claude ${BIN_DIR}/claude
+RUN claude install
 
 # Add Glow
 ARG CHARM_REPO_NAME="charm"
