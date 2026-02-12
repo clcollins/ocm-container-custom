@@ -63,7 +63,7 @@ check_env:
 	@if test -z "${CONTAINER_SUBSYS}" ; then echo 'CONTAINER_SUBSYS must be set. Hint: `source ~/.config/ocm-container/env.source`' ; exit 1 ; fi
 
 .PHONY: clone
-clone: clone_tmux clone_ocm_container clone_ops_sop
+clone: clone_tmux clone_ocm_container # clone_ops_sop
 
 .PHONY: clone_tmux
 clone_tmux:
@@ -84,9 +84,9 @@ ifneq ($(PULL_BASE_IMAGE), TRUE)
 	@git -C $(TMPDIR) clone --depth=1 git@$(SSM)
 endif
 
-.PHONY: clone_ops_sop
-clone_ops_sop:
-	@git -C $(TMPDIR) clone --depth=1 git@$(UTILS).git
+# .PHONY: clone_ops_sop
+# clone_ops_sop:
+# 	@git -C $(TMPDIR) clone --depth=1 git@$(UTILS).git
 
 .PHONY: build
 build: build_tmux build_ocm_container build_custom
@@ -129,9 +129,7 @@ build_ocm_container_micro:
 
 .PHONY: build_custom
 build_custom:
-	@rsync -azv ./ $(TMPDIR)/ops-sop/
-	# @rsync -avz $(TMPDIR)/session-manager-plugin/bin/linux_amd64_plugin/session-manager-plugin $(TMPDIR)/ops-sop/v4/utils/ 
-	@pushd $(TMPDIR)/ops-sop/ && ${CONTAINER_SUBSYS} build --build-arg=GITHUB_TOKEN=${GITHUB_TOKEN} --build-arg=GIT_HASH=${GIT_HASH} $(CACHE) -t ${TAG} .
+	@${CONTAINER_SUBSYS} build --build-arg=GITHUB_TOKEN=${GITHUB_TOKEN} --build-arg=GIT_HASH=${GIT_HASH} $(CACHE) -t ${TAG} .
 
 .PHONY: tag
 tag:
