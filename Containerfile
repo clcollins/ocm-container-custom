@@ -1,5 +1,5 @@
 # Install GH
-FROM quay.io/app-sre/ocm-container:latest as builder
+FROM quay.io/redhat-services-prod/openshift/ocm-container:latest as builder
 ARG GITHUB_TOKEN
 
 RUN dnf install --assumeyes jq tar gzip
@@ -14,7 +14,7 @@ RUN curl -o ${BIN_ASSET} -sSLf -O $(curl -sSLf ${BIN_URL} -o - | jq -r --arg SEL
 RUN tar --extract --gunzip --no-same-owner --strip-components=2 --file ${BIN_ASSET}
 
 # Claude Code Builder
-FROM quay.io/app-sre/ocm-container:latest as claude-builder
+FROM quay.io/redhat-services-prod/openshift/ocm-container:latest as claude-builder
 
 # Version 2.1.39 released 2026-02-10T21:13:30Z
 ARG CLAUDE_VERSION="2.1.39"
@@ -27,7 +27,7 @@ ADD ${CLAUDE_GCS_BUCKET}/${CLAUDE_VERSION}/${CLAUDE_PLATFORM}/claude /tmp/claude
 RUN echo "${CLAUDE_CHECKSUM}  /tmp/claude" | sha256sum --check --status && \
     chmod +x /tmp/claude
 
-FROM quay.io/app-sre/ocm-container:latest
+FROM quay.io/redhat-services-prod/openshift/ocm-container:latest
 MAINTAINER "Chris Collins <chris.collins@redhat.com>"
 
 ARG BIN_DIR="/usr/local/bin"
