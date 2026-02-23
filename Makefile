@@ -3,7 +3,7 @@ REGISTRY_NAME := "quay.io"
 AUTHFILE := "${HOME}/.config/quay.io/bot_auth.json"
 
 ORG_NAME := "chcollin"
-PARENT_ORG_NAME = "app-sre"
+PARENT_ORG_NAME = "redhat-services-prod/openshift"
 
 IMAGE_NAME = "ocm-container"
 GIT_HASH := "$(shell git rev-parse --short HEAD)"
