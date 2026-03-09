@@ -91,10 +91,16 @@ COPY utils/* /root/.local/bin
 # Tmux configuration
 COPY .tmux.conf /root/.tmux.conf
 
-# NO RHEL10 REPO YET
-## Install Vault CLI
-#RUN dnf config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
-#RUN dnf install --assumeyes vault terraform
+# Install Vault CLI (binary installation - no RHEL 10 repo available yet)
+ARG VAULT_VERSION="1.18.4"
+ARG VAULT_URL="https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_amd64.zip"
+RUN dnf install --assumeyes unzip \
+    && curl -o /tmp/vault.zip -sSLf ${VAULT_URL} \
+    && unzip /tmp/vault.zip -d ${BIN_DIR} \
+    && rm /tmp/vault.zip \
+    && chmod +x ${BIN_DIR}/vault \
+    && dnf clean all \
+    && rm --recursive --force /var/cache/yum/
 
 LABEL ocm_container_custom_version=${GIT_HASH}
 ENV   ocm_container_custom_version=${GIT_HASH}
