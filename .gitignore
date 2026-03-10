@@ -6,6 +6,10 @@
 
 debug*
 
+# Claude
+.claude/settings.local.json
+.claude/*.log
+.claude/cache/
 
 # Bins
 bin/oc-pod2log
