@@ -28,5 +28,5 @@ fi
 touch "$LOCKFILE"
 
 # Display cluster context information
-osdctl cluster context --cluster-id "$CLUSTER_ID"
+osdctl cluster context --cluster-id "$CLUSTER_ID" --skip-version-check
 
