@@ -10,7 +10,8 @@ This CLAUDE.md applies equally to development of the OCM-Container project, but 
 
 A SessionStart hook is configured in `.claude/settings.local.json` that automatically identifies and displays the runtime environment at the start of each session. The hook checks:
 
-* `$OCM_CONTAINER = 1` indicates OCM-Container Environment (Operational Tasks Mode)
+* `$IO_OPENSHIFT_MANAGED_NAME = "ocm-container"` indicates OCM-Container Environment (Operational Tasks Mode)
+  - Note: This is the canonical way to identify ocm-container processes
 * `$TOOLBOX_PATH` set indicates Toolbox Development Environment (Development Tasks Mode)
 * Otherwise indicates Unknown Environment
 
