@@ -16,6 +16,12 @@ if [ -z "$TMUX" ]; then
 	return
 fi
 
+# Skip if this is the Claude Code pane (fallback check via pane title)
+PANE_TITLE=$(tmux display-message -p '#{pane_title}' 2>/dev/null)
+if [ "$PANE_TITLE" = "Claude Code" ]; then
+	return
+fi
+
 # Create lockfile path based on cluster ID to ensure one-time execution per cluster
 LOCKFILE="/tmp/osdctl-cluster-context-${CLUSTER_ID}.flag"
 
