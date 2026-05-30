@@ -102,5 +102,7 @@ RUN dnf install --assumeyes unzip \
     && dnf clean all \
     && rm --recursive --force /var/cache/yum/
 
+ENV   CLAUDE_PROMPT="Do not investigate anything yet. Summarize what you know about this PagerDuty Incident."
+
 LABEL ocm_container_custom_version=${GIT_HASH}
 ENV   ocm_container_custom_version=${GIT_HASH}
