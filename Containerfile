@@ -40,7 +40,7 @@ RUN dnf install --assumeyes 'dnf-command(config-manager)' \
     && dnf clean all \
     && rm --recursive --force /var/cache/yum/
 
-RUN python3 -m pip install rh-aws-saml-login
+RUN python3 -m pip install rh-aws-saml-login httpie
 
 # Install Google Coud CLI
 ARG GCLOUD_CLI="https://packages.cloud.google.com/yum/repos/cloud-sdk-el9-x86_64"
