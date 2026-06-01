@@ -36,7 +36,7 @@ ARG PKGS="openldap-clients jq tar gzip krb5-devel python3-devel clang nodejs-npm
 ARG GIT_HASH="xxxxxxxx"
 
 RUN dnf install --assumeyes 'dnf-command(config-manager)' \
-    && dnf install --assumeyes openldap-clients jq tar gzip krb5-devel python3-devel clang \ 
+    && dnf install --assumeyes openldap-clients jq tar gzip krb5-devel python3-devel clang yq \ 
     && dnf clean all \
     && rm --recursive --force /var/cache/yum/
 
@@ -102,7 +102,7 @@ RUN dnf install --assumeyes unzip \
     && dnf clean all \
     && rm --recursive --force /var/cache/yum/
 
-ENV   CLAUDE_PROMPT="Do not investigate anything yet. Summarize what you know about this PagerDuty Incident."
+ENV   CLAUDE_PROMPT="You are in an OCM Container. Summarize what you know about this PagerDuty Incident from the ENV variables, cluster context, service logs and SOPs."
 
 LABEL ocm_container_custom_version=${GIT_HASH}
 ENV   ocm_container_custom_version=${GIT_HASH}
