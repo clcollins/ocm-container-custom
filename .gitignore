@@ -14,5 +14,6 @@ debug*
 # Bins
 bin/oc-pod2log
 bin/oc-dtlogs
+bin/osdctl
 
 NON_ROOT_MIGRATION_PLAN.md

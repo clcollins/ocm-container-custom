@@ -104,5 +104,8 @@ RUN dnf install --assumeyes unzip \
 
 ENV   CLAUDE_PROMPT="You are in an OCM Container. Summarize what you know about this PagerDuty Incident from the ENV variables, cluster context, service logs and SOPs."
 
+# TEMPORARY: test osdctl with vault dynamic callback port support
+COPY bin/osdctl ${BIN_DIR}/osdctl
+
 LABEL ocm_container_custom_version=${GIT_HASH}
 ENV   ocm_container_custom_version=${GIT_HASH}
