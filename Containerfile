@@ -16,9 +16,9 @@ RUN tar --extract --gunzip --no-same-owner --strip-components=2 --file ${BIN_ASS
 # Claude Code Builder
 FROM quay.io/redhat-services-prod/openshift/ocm-container:latest as claude-builder
 
-# Version 2.1.39 released 2026-02-10T21:13:30Z
-ARG CLAUDE_VERSION="2.1.39"
-ARG CLAUDE_CHECKSUM="68e4775b293d95e06d168581c523fc5c1523968179229d31a029f285b2aceaff"
+# Version 2.1.204 released 2026-07-08
+ARG CLAUDE_VERSION="2.1.204"
+ARG CLAUDE_CHECKSUM="c8ee1ea69154533c691a68f46abb645196fe7339d26e6fc204cc7f08220139d3"
 ARG CLAUDE_PLATFORM="linux-x64"
 ARG CLAUDE_GCS_BUCKET="https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases"
 
@@ -26,6 +26,15 @@ ARG CLAUDE_GCS_BUCKET="https://storage.googleapis.com/claude-code-dist-86c565f3-
 ADD ${CLAUDE_GCS_BUCKET}/${CLAUDE_VERSION}/${CLAUDE_PLATFORM}/claude /tmp/claude
 RUN echo "${CLAUDE_CHECKSUM}  /tmp/claude" | sha256sum --check --status && \
     chmod +x /tmp/claude
+
+# MCP Servers Builder
+FROM golang:1.26 as mcp-builder
+
+# Install shim-mcp (pure Go, no CGO)
+RUN go install github.com/clcollins/shim-mcp/cmd/shim-mcp@latest
+
+# Install mnemo (requires CGO for sqlite)
+RUN CGO_ENABLED=1 go install github.com/clcollins/mnemo/cmd/mnemo@latest
 
 FROM quay.io/redhat-services-prod/openshift/ocm-container:latest
 MAINTAINER "Chris Collins <chris.collins@redhat.com>"
@@ -69,6 +78,10 @@ RUN gh --version
 # Install Claude Code
 COPY --from=claude-builder /tmp/claude ${BIN_DIR}/claude
 RUN claude install
+
+# Install MCP servers
+COPY --from=mcp-builder /go/bin/shim-mcp ${BIN_DIR}/shim-mcp
+COPY --from=mcp-builder /go/bin/mnemo ${BIN_DIR}/mnemo
 
 # Add Glow
 ARG CHARM_REPO_NAME="charm"
