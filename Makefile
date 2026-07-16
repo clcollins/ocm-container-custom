@@ -14,7 +14,6 @@ TAG_LATEST := ${REGISTRY_NAME}/${ORG_NAME}/${IMAGE_NAME}:latest
 TAG_MICRO_LATEST := ${REGISTRY_NAME}/${ORG_NAME}/${IMAGE_NAME}-micro:latest
 # TAG_LATEST_MINIMAL := ${REGISTRY_NAME}/${ORG_NAME}/${IMAGE_NAME}-minimal:latest
 
-TMUX_IMAGE_NAME = "tmux:latest"
 SSM_IMAGE_NAME = "aws-session-manager-plugin:latest"
 
 # GIT REPO VARIABLES
@@ -24,7 +23,6 @@ OCM_CONTAINER_BRANCH = "master"
 
 UTILS = "github.com:openshift/ops-sop"
 
-TMUX = "github.com:clcollins/tmux-static-builder"
 SSM = "github.com:aws/session-manager-plugin"
 
 # VPN
@@ -63,13 +61,7 @@ check_env:
 	@if test -z "${CONTAINER_SUBSYS}" ; then echo 'CONTAINER_SUBSYS must be set. Hint: `source ~/.config/ocm-container/env.source`' ; exit 1 ; fi
 
 .PHONY: clone
-clone: clone_tmux clone_ocm_container # clone_ops_sop
-
-.PHONY: clone_tmux
-clone_tmux:
-ifneq ($(PULL_BASE_IMAGE), TRUE)
-	git -C $(TMPDIR) clone --depth=1 git@$(TMUX).git
-endif
+clone: clone_ocm_container # clone_ops_sop
 
 .PHONY: clone_ocm_container
 clone_ocm_container:
@@ -89,17 +81,7 @@ endif
 # 	@git -C $(TMPDIR) clone --depth=1 git@$(UTILS).git
 
 .PHONY: build
-build: build_tmux build_ocm_container build_custom
-
-.PHONY: build_tmux
-build_tmux:
-ifneq ($(PULL_BASE_IMAGE), TRUE)
-	@pushd $(TMPDIR)/tmux-static-builder && make BUILD_ARGS="--build-arg=GITHUB_TOKEN=${GITHUB_TOKEN}"
-else
-	# podman pull "quay.io"/"chcollin"/"tmux:latest"
-	$(CONTAINER_SUBSYS) pull ${REGISTRY_NAME}/${ORG_NAME}/${TMUX_IMAGE_NAME}
-	$(CONTAINER_SUBSYS) tag ${REGISTRY_NAME}/${ORG_NAME}/${TMUX_IMAGE_NAME} ${TMUX_IMAGE_NAME}
-endif
+build: build_ocm_container build_custom
 
 .PHONY: build_ssm
 build_ssm:
