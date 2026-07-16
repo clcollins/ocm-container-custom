@@ -1,3 +1,8 @@
+# Install tmux from CentOS Stream 9 (not available in UBI9 repos without RHEL entitlements)
+FROM quay.io/centos/centos:stream9 AS tmux-builder
+RUN dnf install --assumeyes --nodocs tmux \
+    && dnf clean all
+
 # Install GH
 FROM quay.io/redhat-services-prod/openshift/ocm-container:latest as builder
 ARG GITHUB_TOKEN
@@ -68,7 +73,7 @@ RUN rpm --import $GCLOUD_KEYS \
     && rm --recursive --force /var/cache/yum/
 
 # Install TMUX
-COPY --from=quay.io/chcollin/tmux:latest /tmux ${BIN_DIR}
+COPY --from=tmux-builder /usr/bin/tmux ${BIN_DIR}/tmux
 RUN tmux -V
 
 # Install GH
