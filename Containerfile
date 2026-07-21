@@ -1,7 +1,31 @@
-# Install tmux from CentOS Stream 9 (not available in UBI9 repos without RHEL entitlements)
-FROM quay.io/centos/centos:stream9 AS tmux-builder
-RUN dnf install --assumeyes --nodocs tmux \
-    && dnf clean all
+# Build tmux from source (not available in UBI repos without RHEL entitlements)
+FROM quay.io/redhat-services-prod/openshift/ocm-container:latest AS tmux-builder
+
+ARG TMUX_VERSION="3.5a"
+ARG TMUX_SHA256="16216bd0877170dfcc64157085ba9013610b12b082548c7c9542cc0103198951"
+
+RUN dnf install --assumeyes --nodocs \
+        autoconf \
+        automake \
+        gcc \
+        libevent-devel \
+        make \
+        ncurses-devel \
+    && dnf clean all \
+    && rm --recursive --force /var/cache/yum
+
+WORKDIR /build
+RUN curl --silent --location --fail \
+        "https://github.com/tmux/tmux/releases/download/${TMUX_VERSION}/tmux-${TMUX_VERSION}.tar.gz" \
+        --output tmux.tar.gz \
+    && echo "${TMUX_SHA256}  tmux.tar.gz" | sha256sum --check --status \
+    && tar --extract --gzip --file tmux.tar.gz \
+    && ln --symbolic /usr/bin/true /usr/local/bin/yacc \
+    && cd "tmux-${TMUX_VERSION}" \
+    && ./configure --prefix=/usr \
+    && make -j "$(nproc)" \
+    && make install DESTDIR=/build/out \
+    && strip --strip-all /build/out/usr/bin/tmux
 
 # Install GH
 FROM quay.io/redhat-services-prod/openshift/ocm-container:latest as builder
@@ -73,7 +97,7 @@ RUN rpm --import $GCLOUD_KEYS \
     && rm --recursive --force /var/cache/yum/
 
 # Install TMUX
-COPY --from=tmux-builder /usr/bin/tmux ${BIN_DIR}/tmux
+COPY --from=tmux-builder /build/out/usr/bin/tmux ${BIN_DIR}/tmux
 RUN tmux -V
 
 # Install GH
