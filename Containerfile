@@ -101,6 +101,31 @@ RUN go install github.com/clcollins/shim-mcp/cmd/shim-mcp@latest
 RUN CGO_ENABLED=1 go install github.com/clcollins/mnemo/cmd/mnemo@latest
 
 # ---------------------------------------------------------------------------
+# virtctl builder
+# ---------------------------------------------------------------------------
+FROM base AS virtctl-builder
+
+ARG VIRTCTL_VERSION="v1.9.0"
+ARG VIRTCTL_SHA256="40ede2ee37c98a1aeed71c9c219616a05247ce2be109e1edddf0477572e8b978"
+
+ADD https://github.com/kubevirt/kubevirt/releases/download/${VIRTCTL_VERSION}/virtctl-${VIRTCTL_VERSION}-linux-amd64 /tmp/virtctl
+RUN echo "${VIRTCTL_SHA256}  /tmp/virtctl" | sha256sum --check --status \
+    && chmod +x /tmp/virtctl
+
+# ---------------------------------------------------------------------------
+# Helm builder
+# ---------------------------------------------------------------------------
+FROM base AS helm-builder
+
+ARG HELM_VERSION="v4.3.0"
+ARG HELM_SHA256="86584a54def73570558f66f5111cc53dfed56689637ae32c1201205d494f54fb"
+
+ADD https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz /tmp/helm.tar.gz
+RUN echo "${HELM_SHA256}  /tmp/helm.tar.gz" | sha256sum --check --status \
+    && tar --extract --gzip --file /tmp/helm.tar.gz --directory /tmp --strip-components=1 linux-amd64/helm \
+    && chmod +x /tmp/helm
+
+# ---------------------------------------------------------------------------
 # Python tooling builder
 # ---------------------------------------------------------------------------
 # rh-aws-saml-login and httpie are installed via pip into a self-contained
@@ -252,6 +277,14 @@ RUN claude install
 # Install MCP servers
 COPY --from=mcp-builder /go/bin/shim-mcp ${BIN_DIR}/shim-mcp
 COPY --from=mcp-builder /go/bin/mnemo ${BIN_DIR}/mnemo
+
+# Install virtctl
+COPY --from=virtctl-builder /tmp/virtctl ${BIN_DIR}/virtctl
+RUN virtctl version --client
+
+# Install Helm
+COPY --from=helm-builder /tmp/helm ${BIN_DIR}/helm
+RUN helm version --short
 
 # Install Python tooling (rh-aws-saml-login, httpie) from the prebuilt venv.
 # Symlink the entrypoints onto PATH so they behave like system installs.
